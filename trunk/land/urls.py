@@ -4,7 +4,7 @@ from .handlers import InstanceLandHandler, ListOrCreateLandHandler
 
 
 app = webapp2.WSGIApplication([
-        ('/lands/?', ListOrCreateLandHandler),
-        ('/lands/([\w-]*)/?', InstanceLandHandler),
+        ('/api/lands/?', ListOrCreateLandHandler),
+        ('/api/lands/([\w-]*)/?', InstanceLandHandler),
     ],
     debug=True)
