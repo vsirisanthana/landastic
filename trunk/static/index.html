@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="Landastic">
 <head>
     <title>Landastic</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
@@ -13,38 +13,7 @@
         #map_canvas img { max-width: none; }
         #lands_span { height: 100%; overflow-y: scroll; }
     </style>
-    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
-    <script type="text/javascript" src="lib/bootstrap/js/bootstrap.js"></script>
-    <script type="text/javascript"
-            src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBf9_6dgjtdzdn1lqYPWn209VPUN6Kv040&sensor=false">
-    </script>
-    <script type="text/javascript">
-        function initialize() {
-            // Get lands
-            var lands = [
-                {
-                    "name": "Antelope Canyon",
-                    "key": "ag1kZXZ-bGFuZGFzdGljcgoLEgRMYW5kGAEM",
-                    "location": "36.862,-111.372"
-                },
-                {
-                    "name": "The Wave",
-                    "key": "ag1kZXZ-bGFuZGFzdGljcgoLEgRMYW5kGAIM",
-                    "location": "36.966,-112.012"
-                }
-            ];
 
-            var myOptions = {
-                center: new google.maps.LatLng(-34.397, 150.644),
-                zoom: 8,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
-            };
-            var map = new google.maps.Map(document.getElementById("map_canvas"),
-                    myOptions);
-
-
-        }
-    </script>
 </head>
 <body onload="initialize()">
 <div class="navbar navbar-fixed-top">
@@ -64,19 +33,42 @@
         </div>
     </div>
 </div>
-<div id="content" class="row-fluid">
+<div id="content" class="row-fluid" ng-controller="LandsCtrl">
     <div id="map_span" class="span9">
         <div id="map_canvas"></div>
     </div>
     <div id="lands_span" class="span3">
         <table class="table table-condense table-striped">
             <tbody>
-                <tr><td><strong>Supreme Elegance</strong><br/>10.203015, -123.573222</td></tr>
-                <tr><td><strong>Parco</strong><br/>10.203015, -123.573222</td></tr>
-                <tr><td><strong>Domus</strong><br/>10.203015, -123.483210</td></tr>
+                <tr ng-repeat="land in lands">
+                    <td><strong>{{ land.name }}</strong><br/>{{ land.location }}</td>
+                </tr>
+                <!--<tr><td><strong>Parco</strong><br/>10.203015, -123.573222</td></tr>-->
+                <!--<tr><td><strong>Domus</strong><br/>10.203015, -123.483210</td></tr>-->
             </tbody>
         </table>
     </div>
 </div>
+
+<!--<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>-->
+<script type="text/javascript" src="lib/jquery/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="lib/bootstrap/js/bootstrap.js"></script>
+<script type="text/javascript" src="lib/angular/angular-1.0.0rc8.min.js"></script>
+<script type="text/javascript" src="lib/angular/angular-resource-1.0.0rc8.min.js"></script>
+<!--<script type="text/javascript"-->
+        <!--src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBf9_6dgjtdzdn1lqYPWn209VPUN6Kv040&sensor=false">-->
+<!--</script>-->
+<script type="text/javascript" src="js/landastic.js"></script>
+<script type="text/javascript">
+    function initialize() {
+//        var myOptions = {
+//            center: new google.maps.LatLng(-34.397, 150.644),
+//            zoom: 8,
+//            mapTypeId: google.maps.MapTypeId.ROADMAP
+//        };
+//        var map = new google.maps.Map(document.getElementById("map_canvas"),
+//                myOptions);
+    }
+</script>
 </body>
 </html>
