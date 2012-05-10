@@ -12,6 +12,8 @@
         #map_canvas { height: 100%; }
         #map_canvas img { max-width: none; }
         #lands_span { height: 100%; overflow-y: scroll; }
+        #lands_action { margin: 10px 0px 10px 0px; }
+        #land_add_span { padding: 2px 20px 20px 20px;}
     </style>
 
 </head>
@@ -28,25 +30,64 @@
             <div class="nav-collapse">
                 <ul class="nav pull-right">
                     <li><a href="#">Welcome <strong>Anonymous</strong></a></li>
+                    <li class="divider-vertical"></li>
+                    <li><a href="#add">Add</a></li>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Sort by <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">Action</a></li>
+                            <li><a href="#">Another action</a></li>
+                            <li><a href="#">Something else here</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#">Separated link</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>
     </div>
 </div>
 <div id="content" class="row-fluid" ng-controller="LandsCtrl">
-    <div id="map_span" class="span9">
+    <div id="map_span" class="span7">
         <div id="map_canvas"></div>
     </div>
-    <div id="lands_span" class="span3">
+    <div id="lands_span" class="span3" style="display: none">
         <table class="table table-condense table-striped">
             <tbody>
                 <tr ng-repeat="land in lands">
+                    <td><input type="checkbox" /></td>
                     <td><strong>{{ land.name }}</strong><br/>{{ land.location }}</td>
+                    <!--<td><button class="icon-circle-arrow-down"></button></td>-->
                 </tr>
-                <!--<tr><td><strong>Parco</strong><br/>10.203015, -123.573222</td></tr>-->
-                <!--<tr><td><strong>Domus</strong><br/>10.203015, -123.483210</td></tr>-->
             </tbody>
         </table>
+    </div>
+    <div id="land_add_span" class="span5">
+        <form class="form-horizontal pull-right" title="Add Land">
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button class="btn">Cancel</button>
+            </div>
+            <fieldset>
+                <legend>Basics</legend>
+                <div class="control-group">
+                    <label class="control-label" for="land_name">Name</label>
+                    <div class="controls">
+                        <input type="text" class="input-xlarge" id="land_name" name="name" ng-model="land_name"/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="land_location">Location</label>
+                    <div class="controls">
+                        <input type="text" class="input-xlarge" id="land_location" name="name" ng-model="land_location"/>
+                    </div>
+                </div>
+            </fieldset>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button class="btn">Cancel</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -55,19 +96,19 @@
 <script type="text/javascript" src="lib/bootstrap/js/bootstrap.js"></script>
 <script type="text/javascript" src="lib/angular/angular-1.0.0rc8.min.js"></script>
 <script type="text/javascript" src="lib/angular/angular-resource-1.0.0rc8.min.js"></script>
-<!--<script type="text/javascript"-->
-        <!--src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBf9_6dgjtdzdn1lqYPWn209VPUN6Kv040&sensor=false">-->
-<!--</script>-->
+<script type="text/javascript"
+        src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBf9_6dgjtdzdn1lqYPWn209VPUN6Kv040&sensor=false">
+</script>
 <script type="text/javascript" src="js/landastic.js"></script>
 <script type="text/javascript">
     function initialize() {
-//        var myOptions = {
-//            center: new google.maps.LatLng(-34.397, 150.644),
-//            zoom: 8,
-//            mapTypeId: google.maps.MapTypeId.ROADMAP
-//        };
-//        var map = new google.maps.Map(document.getElementById("map_canvas"),
-//                myOptions);
+        var myOptions = {
+            center: new google.maps.LatLng(-34.397, 150.644),
+            zoom: 8,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        var map = new google.maps.Map(document.getElementById("map_canvas"),
+                myOptions);
     }
 </script>
 </body>
