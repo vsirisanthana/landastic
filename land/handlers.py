@@ -17,9 +17,19 @@ class InstanceLandHandler(webapp2.RequestHandler):
         try:
             land = Land.get(key)
         except db.BadKeyError:
-            self.response.out.write(simplejson.dumps('Not found'))
+            self.error(404)
         else:
             self.response.out.write(simplejson.dumps(to_dict(land)))
+        self.response.headers['Content-Type'] = 'application/json'
+
+    def delete(self, key):
+        try:
+            land = Land.get(key)
+        except db.BadKeyError:
+            self.error(404)
+        else:
+            land.delete()
+            self.response.set_status(204)
         self.response.headers['Content-Type'] = 'application/json'
 
 
@@ -28,15 +38,23 @@ class ListOrCreateLandHandler(webapp2.RequestHandler):
     def get(self):
         lands = [to_dict(land) for land in Land.gql('')]
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(simplejson.dumps({'results': lands}))
+#        self.response.out.write(simplejson.dumps({'results': lands}))
+        self.response.out.write(simplejson.dumps(lands))
 
     def post(self):
-        name = self.request.get('name')
-        location = self.request.get('location')
+        if self.request.headers['Content-Type'] == 'application/json':
+            body = simplejson.loads(self.request.body)
+            name = body['name']
+            location = body['location']
+        else:
+            name = self.request.get('name')
+            location = self.request.get('location')
+
         lat, lng = [l.strip() for l in location.split(',')]
 
         land = Land(name=name, location=db.GeoPt(lat, lng))
         land.put()
 
+        self.response.set_status(201)
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write('"Successfully created land %s"' % land.name)
+        self.response.out.write(simplejson.dumps(to_dict(land)))
