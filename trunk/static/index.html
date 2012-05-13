@@ -12,12 +12,12 @@
         #map_canvas { height: 100%; }
         #map_canvas img { max-width: none; }
         #lands_span { height: 100%; overflow-y: scroll; }
-        #lands_action { margin: 10px 0px 10px 0px; }
-        #land_add_span { padding: 2px 20px 20px 20px;}
+        /*#lands_action { margin: 10px 0px 10px 0px; }*/
+        /*#land_add_span { padding: 2px 20px 20px 20px;}*/
     </style>
 
 </head>
-<body onload="initialize()">
+<body ng-controller="LandsCtrl" onload="initialize()">
 <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container-fluid">
@@ -31,7 +31,7 @@
                 <ul class="nav pull-right">
                     <li><a href="#">Welcome <strong>Anonymous</strong></a></li>
                     <li class="divider-vertical"></li>
-                    <li><a href="#add">Add</a></li>
+                    <li><a href="#add" ng-click="addLand()">Add</a></li>
                     <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">Sort by <b class="caret"></b></a>
                         <ul class="dropdown-menu">
@@ -47,39 +47,43 @@
         </div>
     </div>
 </div>
-<div id="content" class="row-fluid" ng-controller="LandsCtrl">
-    <div id="map_span" class="span7">
+<div id="content" class="row-fluid">
+    <div id="map_span" class="span{{ map_span_size }}">
         <div id="map_canvas"></div>
     </div>
-    <div id="lands_span" class="span3" style="display: none">
+    <div id="lands_span" class="span{{ lands_span_size }}">
+
+        <p>Route: {{ $location.path() }} ...</p>
+
         <table class="table table-condense table-striped">
             <tbody>
-                <tr ng-repeat="land in lands">
-                    <td><input type="checkbox" /></td>
-                    <td><strong>{{ land.name }}</strong><br/>{{ land.location }}</td>
-                    <!--<td><button class="icon-circle-arrow-down"></button></td>-->
-                </tr>
+            <tr ng-repeat="land in lands" ng-click="editLand(land)">
+                <!--<td><input type="checkbox" ng-click="deleteLand(land)"/></td>-->
+                <td><strong>{{ land.name }}</strong><br/>{{ land.location }}</td>
+                <!--<td><button class="icon-circle-arrow-down"></button></td>-->
+            </tr>
             </tbody>
         </table>
     </div>
-    <div id="land_add_span" class="span5">
-        <form class="form-horizontal pull-right" title="Add Land">
+    <div id="land_add_span" class="span{{ land_span_size }}">
+        <form class="form-horizontal" ng-submit="saveLand()">
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">Save</button>
                 <button class="btn">Cancel</button>
             </div>
             <fieldset>
                 <legend>Basics</legend>
+                <input type="text" ng-model="active_land.key"/>
                 <div class="control-group">
                     <label class="control-label" for="land_name">Name</label>
                     <div class="controls">
-                        <input type="text" class="input-xlarge" id="land_name" name="name" ng-model="land_name"/>
+                        <input type="text" id="land_name" ng-model="active_land.name"/>
                     </div>
                 </div>
                 <div class="control-group">
                     <label class="control-label" for="land_location">Location</label>
                     <div class="controls">
-                        <input type="text" class="input-xlarge" id="land_location" name="name" ng-model="land_location"/>
+                        <input type="text" id="land_location" ng-model="active_land.location"/>
                     </div>
                 </div>
             </fieldset>
@@ -90,6 +94,8 @@
         </form>
     </div>
 </div>
+<div ng-view></div>
+
 
 <!--<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>-->
 <script type="text/javascript" src="lib/jquery/jquery-1.7.2.min.js"></script>
@@ -100,16 +106,5 @@
         src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBf9_6dgjtdzdn1lqYPWn209VPUN6Kv040&sensor=false">
 </script>
 <script type="text/javascript" src="js/landastic.js"></script>
-<script type="text/javascript">
-    function initialize() {
-        var myOptions = {
-            center: new google.maps.LatLng(-34.397, 150.644),
-            zoom: 8,
-            mapTypeId: google.maps.MapTypeId.ROADMAP
-        };
-        var map = new google.maps.Map(document.getElementById("map_canvas"),
-                myOptions);
-    }
-</script>
 </body>
 </html>
