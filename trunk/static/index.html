@@ -31,7 +31,7 @@
                 <ul class="nav pull-right">
                     <li><a href="#">Welcome <strong>Anonymous</strong></a></li>
                     <li class="divider-vertical"></li>
-                    <li><a href="#add" ng-click="addLand()">Add</a></li>
+                    <li><a href="#/add" >Add</a></li>
                     <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">Sort by <b class="caret"></b></a>
                         <ul class="dropdown-menu">
@@ -53,7 +53,12 @@
     </div>
     <div id="lands_span" class="span{{ lands_span_size }}">
 
-        <p>Route: {{ $location.path() }} ...</p>
+        <p>Protocol: {{ $location.protocol() }} ...</p>
+        <p>Host: {{ $location.host() }} ...</p>
+        <p>Port: {{ $location.port() }} ...</p>
+        <p>Path: {{ $location.path() }} ...</p>
+        <p>Search: {{ $location.search() }} ...</p>
+        <p>Hash: {{ $location.hash() }} ...</p>
 
         <table class="table table-condense table-striped">
             <tbody>
