@@ -1,4 +1,4 @@
-angular.module('Landastic', ['ngResource']);
+//angular.module('Landastic', ['ngResource']);
 
 //angular.module('Landastic', ['ngResource']).
 //    config(['$routeProvider', function($routeProvider) {
@@ -9,13 +9,14 @@ angular.module('Landastic', ['ngResource']);
 //    }]);
 
 
-//angular.module('Landastic', ['ngResource']).
-//    config(['$routeProvider', function($routeProvider) {
-//        $routeProvider.
-//            when('/').
-//            when('/add')
-//            otherwise({redirectTo: '/'});
-//    }]);
+angular.module('Landastic', ['ngResource']).
+    config(['$routeProvider', function($routeProvider) {
+        $routeProvider.
+            when('/', {template: 'partials/list.html'}).
+            when('/add', {template: 'partials/add.html'}).
+            when('/edit/:key', {template: 'partials/add.html'}).
+            otherwise({redirectTo: '/'});
+    }]);
 
 //angular.module('Landastic', ['ngResource']).
 //    config(['$locationProvider', function($locationProvider) {
@@ -41,29 +42,42 @@ function LandsCtrl($scope, $location, $resource) {
 //        console.log(route.template);
 //    });
 
-    $scope.$location = $location;
+//    $scope.test_var = 15;
 
-    $scope.map_span_size = 4;
-    $scope.lands_span_size = 4;
-    $scope.land_span_size = 4;
+//    $scope.$location = $location;
 
-    $scope.Land = $resource('/api/lands/:key', {key: '@key'});
+//    $scope.map_span_size = 8;
+//    $scope.lands_span_size = 4;
+//    $scope.land_span_size = 4;
+
+    $scope.Land = $resource('/api/lands/:key', {key: '@key'}, {update: {method: 'PUT'}});
 
     $scope.lands = $scope.Land.query();
 
     $scope.saveLand = function() {
 
-        var land = new $scope.Land({
-            name: $scope.active_land.name,
-            location: $scope.active_land.location
-        })
+        if ($scope.active_land.key == null && $scope.active_land.key == '') {
 
-        land.$save({}, function() {
-            $scope.lands.unshift(land);
-        }, function() {
-            console.log('error');
-        });
+            $scope.active_land.$save({}, function() {
+                $scope.lands.unshift($scope.active_land);
+                $location.path('/');
+            }, function() {
+                console.log('error');
+            });
+        }
 
+        else {
+            $scope.active_land.$update({}, function() {
+
+                for (attr in $scope.active_land) {
+                    console.log(attr);
+
+                    $scope.master[attr] = $scope.active_land[attr];
+                }
+
+                $location.path('/');
+            });
+        }
     };
 
     $scope.addLand = function() {
@@ -75,13 +89,13 @@ function LandsCtrl($scope, $location, $resource) {
     };
 
     $scope.editLand = function(land) {
-        console.log('Editing land');
-        $scope.active_land = land;
+        $scope.master = land;
+        $scope.active_land = angular.copy(land);
+//        $scope.active_land = $scope.Land.get({key: land.key});
     };
 
     $scope.deleteLand = function(land) {
         land.$delete();
     };
-
 
 };

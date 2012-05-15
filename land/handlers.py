@@ -22,6 +22,29 @@ class InstanceLandHandler(webapp2.RequestHandler):
             self.response.out.write(simplejson.dumps(to_dict(land)))
         self.response.headers['Content-Type'] = 'application/json'
 
+    def put(self, key):
+        try:
+            land = Land.get(key)
+        except db.BadKeyError:
+            self.error(404)
+        else:
+            if self.request.headers['Content-Type'] == 'application/json':
+                body = simplejson.loads(self.request.body)
+                name = body['name']
+                location = body['location']
+            else:
+                name = self.request.get('name')
+                location = self.request.get('location')
+
+            lat, lng = [l.strip() for l in location.split(',')]
+
+            land.name = name
+            land.location = db.GeoPt(lat, lng)
+            land.put()
+
+            self.response.headers['Content-Type'] = 'application/json'
+            self.response.out.write(simplejson.dumps(to_dict(land)))
+
     def delete(self, key):
         try:
             land = Land.get(key)
