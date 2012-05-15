@@ -7,12 +7,13 @@
     <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css" />
     <style type="text/css">
         /*html { height: 100%; }*/
-        /*body { height: 100%; }*/
+        /*body { background-color: #999; }*/
         #content { position: absolute; top: 40px; right: 0px; bottom: 0px; left: 0px; }
+        #map_row { height: 100%; }
         #map_span { height: 100%; }
         #map_canvas { height: 100%; }
         #map_canvas img { max-width: none; }
-        #lands_span { height: 100%; overflow-y: scroll; }
+        /*#lands_span { height: 100%; overflow-y: scroll; }*/
         /*#lands_action { margin: 10px 0px 10px 0px; }*/
         /*#land_add_span { padding: 2px 20px 20px 20px;}*/
     </style>
@@ -32,76 +33,28 @@
                 <ul class="nav pull-right">
                     <li><a href="#">Welcome <strong>Anonymous</strong></a></li>
                     <li class="divider-vertical"></li>
-                    <li><a href="/add" >Add</a></li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Sort by <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="#">Action</a></li>
-                            <li><a href="#">Another action</a></li>
-                            <li><a href="#">Something else here</a></li>
-                            <li class="divider"></li>
-                            <li><a href="#">Separated link</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="#/add" ng-click="addLand()">Add</a></li>
+                    <!--<li class="dropdown">-->
+                        <!--<a class="dropdown-toggle" data-toggle="dropdown" href="#">Sort by <b class="caret"></b></a>-->
+                        <!--<ul class="dropdown-menu">-->
+                            <!--<li><a href="#">Action</a></li>-->
+                            <!--<li><a href="#">Another action</a></li>-->
+                            <!--<li><a href="#">Something else here</a></li>-->
+                            <!--<li class="divider"></li>-->
+                            <!--<li><a href="#">Separated link</a></li>-->
+                        <!--</ul>-->
+                    <!--</li>-->
                 </ul>
             </div>
         </div>
     </div>
 </div>
 <div id="content" class="row-fluid">
-    <div id="map_span" class="span{{ map_span_size }}">
+    <div id="map_span" class="span8">
         <div id="map_canvas"></div>
     </div>
-    <div id="lands_span" class="span{{ lands_span_size }}">
-
-        <p>Protocol: {{ $location.protocol() }} ...</p>
-        <p>Host: {{ $location.host() }} ...</p>
-        <p>Port: {{ $location.port() }} ...</p>
-        <p>Path: {{ $location.path() }} ...</p>
-        <p>Search: {{ $location.search() }} ...</p>
-        <p>Hash: {{ $location.hash() }} ...</p>
-
-        <table class="table table-condense table-striped">
-            <tbody>
-            <tr ng-repeat="land in lands" ng-click="editLand(land)">
-                <!--<td><input type="checkbox" ng-click="deleteLand(land)"/></td>-->
-                <td><strong>{{ land.name }}</strong><br/>{{ land.location }}</td>
-                <!--<td><button class="icon-circle-arrow-down"></button></td>-->
-            </tr>
-            </tbody>
-        </table>
-    </div>
-    <div id="land_add_span" class="span{{ land_span_size }}">
-        <form class="form-horizontal" ng-submit="saveLand()">
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Save</button>
-                <button class="btn">Cancel</button>
-            </div>
-            <fieldset>
-                <legend>Basics</legend>
-                <input type="text" ng-model="active_land.key"/>
-                <div class="control-group">
-                    <label class="control-label" for="land_name">Name</label>
-                    <div class="controls">
-                        <input type="text" id="land_name" ng-model="active_land.name"/>
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="land_location">Location</label>
-                    <div class="controls">
-                        <input type="text" id="land_location" ng-model="active_land.location"/>
-                    </div>
-                </div>
-            </fieldset>
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Save</button>
-                <button class="btn">Cancel</button>
-            </div>
-        </form>
-    </div>
+    <div id="control_span" class="span4" ng-view></div>
 </div>
-<div ng-view></div>
-
 
 <!--<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>-->
 <script type="text/javascript" src="lib/jquery/jquery-1.7.2.min.js"></script>
