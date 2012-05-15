@@ -1,4 +1,4 @@
-angular.module('Landastic', ['ngResource']);
+//angular.module('Landastic', ['ngResource']);
 
 //angular.module('Landastic', ['ngResource']).
 //    config(['$routeProvider', function($routeProvider) {
@@ -13,9 +13,15 @@ angular.module('Landastic', ['ngResource']);
 //    config(['$routeProvider', function($routeProvider) {
 //        $routeProvider.
 //            when('/').
-//            when('/add').
+//            when('/add')
 //            otherwise({redirectTo: '/'});
 //    }]);
+
+angular.module('Landastic', ['ngResource']).
+    config(['$locationProvider', function($locationProvider) {
+        $locationProvider.html5Mode(true);
+        $locationProvider.hashPrefix('!');
+    }]);
 
 
 function initialize() {
