@@ -25,41 +25,53 @@ angular.module('Landastic', ['ngResource']).
 //    }]);
 
 
-function initialize() {
+//function initialize() {
+//    var myOptions = {
+//        center: new google.maps.LatLng(-34.397, 150.644),
+//        zoom: 8,
+//        mapTypeId: google.maps.MapTypeId.ROADMAP
+//    };
+//    var map = new google.maps.Map(document.getElementById("map_canvas"),
+//        myOptions);
+//}
+
+
+function LandsCtrl($scope, $location, $resource) {
+
+    $scope.markers = [];
+
     var myOptions = {
         center: new google.maps.LatLng(-34.397, 150.644),
         zoom: 8,
         mapTypeId: google.maps.MapTypeId.ROADMAP
     };
-    var map = new google.maps.Map(document.getElementById("map_canvas"),
+    $scope.map = new google.maps.Map(document.getElementById("map_canvas"),
         myOptions);
-}
 
-
-function LandsCtrl($scope, $location, $resource) {
-
-//    $scope.$on('$afterRouteChange', function(ngEvent, route) {
-//        console.log(route.template);
-//    });
-
-//    $scope.test_var = 15;
-
-//    $scope.$location = $location;
-
-//    $scope.map_span_size = 8;
-//    $scope.lands_span_size = 4;
-//    $scope.land_span_size = 4;
 
     $scope.Land = $resource('/api/lands/:key', {key: '@key'}, {update: {method: 'PUT'}});
 
-    $scope.lands = $scope.Land.query();
+
+    $scope.$watch('lands.length', function(newValue, oldValue) {
+        console.log('lands length changed');
+    });
+
+    $scope.lands = $scope.Land.query({}, function() {
+        $scope.placeMarkers();
+    });
+
 
     $scope.saveLand = function() {
 
-        if ($scope.active_land.key == null && $scope.active_land.key == '') {
+        if (!$scope.active_land.key) {
 
             $scope.active_land.$save({}, function() {
-                $scope.lands.unshift($scope.active_land);
+//                $scope.lands.unshift($scope.active_land);
+
+                $scope.lands = $scope.Land.query({}, function() {
+                    $scope.placeMarkers();
+                });
+
                 $location.path('/');
             }, function() {
                 console.log('error');
@@ -70,7 +82,7 @@ function LandsCtrl($scope, $location, $resource) {
             $scope.active_land.$update({}, function() {
 
                 for (attr in $scope.active_land) {
-                    console.log(attr);
+//                    console.log(attr);
 
                     $scope.master[attr] = $scope.active_land[attr];
                 }
@@ -98,4 +110,17 @@ function LandsCtrl($scope, $location, $resource) {
         land.$delete();
     };
 
+    $scope.placeMarkers = function() {
+        angular.forEach($scope.lands, function(land) {
+            var latLng = land.location.split(',');
+            var marker = new google.maps.Marker({
+                position: new google.maps.LatLng(latLng[0], latLng[1]),
+                title: land.name
+            });
+            marker.setMap($scope.map);
+
+//            $scope.markers.push(marker);
+        })
+
+    }
 };
