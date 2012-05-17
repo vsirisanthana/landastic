@@ -2,7 +2,7 @@
     <tbody>
         <tr ng-repeat="land in lands">
             <!--<td><input type="checkbox" ng-click="deleteLand(land)"/></td>-->
-            <td ><a href="#/edit/{{ land.key }}" ng-click="editLand(land)"><strong>{{ land.name }}</strong><br/>{{ land.location }}</a></td>
+            <td ><a href="#/edit/{{ land.key }}"><strong>{{ land.name }}</strong><br/>{{ land.location }}</a></td>
             <!--<td><button class="icon-circle-arrow-down"></button></td>-->
         </tr>
     </tbody>
