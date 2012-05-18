@@ -69,7 +69,7 @@ function LandsCtrl($scope, $location, $resource, $routeParams) {
 
 
 //    if ($location.path() == '/') {
-//        console.log('/');
+//        console.log(
 //    } else {
 //        console.log($location.path());
 //    }
@@ -80,18 +80,24 @@ function LandsCtrl($scope, $location, $resource, $routeParams) {
 //        console.log('lands length changed done');
     });
 
-    // Navigation
+    // Views
     $scope.landListView = function() {
         $scope.lands = $scope.Land.query();
+        $scope.drawingManager.setOptions({
+            drawingMode: null,
+            drawingControl: false
+        });
     };
 
     $scope.landAddView = function() {
         $scope.activeLand = new $scope.Land();
+        $scope.drawingManager.setOptions({drawingControl: true});
 //        $scope.lands = [];
     };
 
     $scope.landEditView = function(land) {
         $scope.activeLand = angular.copy(land);
+        $scope.drawingManager.setOptions({drawingControl: true});
     }
 
 
@@ -186,10 +192,12 @@ function LandsCtrl($scope, $location, $resource, $routeParams) {
             var location = land.location.split(',');
             var latLng = new google.maps.LatLng(location[0], location[1]);
             var marker = new google.maps.Marker({
+                icon: '/static/img/drw-ToolCircleLarge.png',
+                map: $scope.map,
                 position: latLng,
                 title: land.name
             });
-            marker.setMap($scope.map);
+//            marker.setMap($scope.map);
             $scope.landOverlays.push(marker);
         });
     };
@@ -204,76 +212,23 @@ function LandsCtrl($scope, $location, $resource, $routeParams) {
     };
 
     $scope.refreshLandOverlays = function() {
-//        console.log('deleting overlays' + $scope.landOverlays.length);
         $scope.deleteLandOverlays();
-//        console.log('adding overlays' + $scope.landOverlays.length);
         $scope.addLandOverlays();
-//        console.log('setting new bounds' + $scope.landOverlays.length);
         $scope.setBounds();
-//        console.log('done' + $scope.landOverlays.length);
     };
 };
 
 
 function LandListCtrl($scope) {
-    console.log('land list controller');
     $scope.landListView();
 }
 
 function LandAddCtrl($scope) {
-    console.log('land add controller');
     $scope.landAddView();
 }
 
 function EditLandCtrl($scope, $routeParams, $location) {
-
-    console.log('land edit controller');
-
     var land = $scope.Land.get({key: $routeParams.key}, function() {
         $scope.landEditView(land);
     });
-
-
-
-
-
-//    $scope.saveLand = function() {
-//
-//        console.log('saving land key: ' + $scope.activeLand.key);
-//
-//        if (!$scope.activeLand.key) {
-//
-//            $scope.activeLand.$save({}, function() {
-////                $scope.lands.unshift($scope.activeLand);
-//
-//                $scope.lands = $scope.Land.query({}, function() {
-//                    $scope.refreshLandOverlays();
-//                });
-//
-//                $location.path('/');
-//            }, function() {
-//                console.log('error');
-//            });
-//        }
-//
-//        else {
-//            $scope.activeLand.$update({}, function() {
-//
-////                for (attr in $scope.activeLand) {
-////                    console.log(attr);
-////
-////                    $scope.master[attr] = $scope.activeLand[attr];
-////                }
-//
-//                $scope.lands = $scope.Land.query({}, function() {
-//                    $scope.refreshLandOverlays();
-//                });
-//
-//                $location.path('/');
-//            });
-//        }
-//    };
-
-
-
 }
