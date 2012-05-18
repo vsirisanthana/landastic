@@ -1,4 +1,4 @@
-<form class="form-horizontal" ng-submit="saveLand()">
+<form name="landForm" class="form-horizontal">
     <!--<div class="form-actions">-->
         <!--<button type="submit" class="btn btn-primary">Save</button>-->
         <!--<button class="btn">Cancel</button>-->
@@ -8,19 +8,23 @@
         <div class="control-group">
             <label class="control-label" for="land_name">Name</label>
             <div class="controls">
-                <input type="text" id="land_name" ng-model="activeLand.name"/>
+                <input type="text" id="land_name" ng-model="activeLand.name" name="name" required/>
             </div>
         </div>
         <div class="control-group">
             <label class="control-label" for="land_location">Location</label>
             <div class="controls">
-                <input type="text" id="land_location" ng-model="activeLand.location"/>
+                <input type="text" id="land_location" ng-model="activeLand.location" name="location" required/>
             </div>
         </div>
-        <input type="text" ng-model="activeLand.key"/>
+        <input type="hidden" ng-model="activeLand.key"/>
+        <textarea class="input-xlarge" rows="3" ng-model="activeLand.geom"></textarea>
+
+        <p>a {{ activeLand.geom }} z</p>
+
     </fieldset>
     <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Save</button>
-        <button class="btn">Cancel</button>
+        <button type="submit" class="btn btn-primary" ng-click="saveLand()">Save</button>
+        <button type="reset" class="btn" ng-click="$location.path('#/')">Cancel</button>
     </div>
 </form>

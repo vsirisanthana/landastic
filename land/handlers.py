@@ -32,14 +32,17 @@ class InstanceLandHandler(webapp2.RequestHandler):
                 body = simplejson.loads(self.request.body)
                 name = body['name']
                 location = body['location']
+                geom = body['geom']
             else:
                 name = self.request.get('name')
                 location = self.request.get('location')
+                geom = self.request.get('geom')
 
             lat, lng = [l.strip() for l in location.split(',')]
 
             land.name = name
             land.location = db.GeoPt(lat, lng)
+            land.geom = geom
             land.put()
 
             self.response.headers['Content-Type'] = 'application/json'
@@ -69,13 +72,15 @@ class ListOrCreateLandHandler(webapp2.RequestHandler):
             body = simplejson.loads(self.request.body)
             name = body['name']
             location = body['location']
+            geom = body['geom']
         else:
             name = self.request.get('name')
             location = self.request.get('location')
+            geom = self.request.get('geom')
 
         lat, lng = [l.strip() for l in location.split(',')]
 
-        land = Land(name=name, location=db.GeoPt(lat, lng))
+        land = Land(name=name, location=db.GeoPt(lat, lng), geom=geom)
         land.put()
 
         self.response.set_status(201)
