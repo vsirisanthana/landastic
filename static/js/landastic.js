@@ -1,14 +1,5 @@
 //angular.module('Landastic', ['ngResource']);
 
-//angular.module('Landastic', ['ngResource']).
-//    config(['$routeProvider', function($routeProvider) {
-//        $routeProvider.
-//            when('/', {template: 'partials/list.html', controller: LandsCtrl}).
-//            when('/add', {template: 'partials/add.html', controller: LandsCtrl}).
-//            otherwise({redirectTo: '/'});
-//    }]);
-
-
 angular.module('Landastic', ['ngResource']).
     config(['$routeProvider', function($routeProvider) {
         $routeProvider.
@@ -25,20 +16,7 @@ angular.module('Landastic', ['ngResource']).
 //    }]);
 
 
-//function initialize() {
-//    var myOptions = {
-//        center: new google.maps.LatLng(-34.397, 150.644),
-//        zoom: 8,
-//        mapTypeId: google.maps.MapTypeId.ROADMAP
-//    };
-//    var map = new google.maps.Map(document.getElementById("map_canvas"),
-//        myOptions);
-//}
-
-
-function LandsCtrl($scope, $location, $resource, $routeParams) {
-
-//    $scope.$location = $location;
+function LandsCtrl($scope, $resource) {
 
     // Resources
     $scope.Land = $resource('/api/lands/:key', {key: '@key'}, {update: {method: 'PUT'}});
@@ -67,156 +45,99 @@ function LandsCtrl($scope, $location, $resource, $routeParams) {
     });
     $scope.drawingManager.setMap($scope.map);
 
-    google.maps.event.addListener($scope.drawingManager, 'markercomplete', function(marker) {
-        $scope.landGeom.push(marker);
-        $scope.activeLand.geom = $scope.stringifying($scope.landGeom);
 
-        var position = marker.getPosition();
-        $scope.activeLand.location = position.lat() + ',' + position.lng();
+//    $scope.deleteLand = function(land) {
+//        land.$delete();
+//    };
+
+
+
+
+    $scope.deleteOverlays = function(overlays) {
+        if (overlays) {
+            angular.forEach(overlays, function(overlay) {
+                overlay.setMap(null);
+            });
+            overlays.length = 0;
+        }
+    };
+
+    $scope.showOverlays = function(overlays) {
+        if (overlays) {
+            angular.forEach(overlays, function(overlay) {
+                overlay.setMap($scope.map);
+            });
+        }
+    };
+}
+
+
+function LandListCtrl($scope) {
+
+    $scope.overlays = [];
+
+    $scope.$on('$beforeRouteChange', function() {
+        $scope.deleteOverlays($scope.overlays);
+    });
+
+    $scope.lands = $scope.Land.query({}, function() {
+        $scope.overlays = $scope.lands.map(function(land) {
+            var location = land.location.split(',');
+            var latLng = new google.maps.LatLng(location[0], location[1]);
+            return new google.maps.Marker({
+                icon: '/static/img/drw-ToolCircleLarge.png',
+                position: latLng,
+                title: land.name
+            });
+        });
+        $scope.showOverlays($scope.overlays);
+        $scope.map.fitBounds(getBounds($scope.overlays));
+    });
+
+    $scope.drawingManager.setOptions({
+        drawingMode: null,
+        drawingControl: false
+    });
+
+    google.maps.event.clearListeners($scope.drawingManager, 'markercomplete');
+    google.maps.event.clearListeners($scope.drawingManager, 'circlecomplete');
+
+
+}
+
+function LandAddCtrl($scope, $location) {
+
+    $scope.$location = $location;
+
+    $scope.$on('$beforeRouteChange', function() {
+        $scope.deleteOverlays($scope.overlays);
+    });
+
+
+    $scope.activeLand = new $scope.Land();
+    $scope.drawingManager.setOptions({drawingControl: true});
+
+    $scope.overlays = [];
+
+    $scope.$watch('overlays.length', function() {
+        $scope.activeLand.geom = serializeOverlays($scope.overlays);
+
+        var center = getBounds($scope.overlays).getCenter();
+        $scope.activeLand.location = center.lat() + ',' + center.lng();
+    });
+
+    google.maps.event.addListener($scope.drawingManager, 'markercomplete', function(marker) {
+        $scope.overlays.push(marker);
         $scope.$apply();
     });
 
     google.maps.event.addListener($scope.drawingManager, 'circlecomplete', function(circle) {
-        $scope.landGeom.push(circle);
-        $scope.activeLand.geom = $scope.stringifying($scope.landGeom);
+        $scope.overlays.push(circle);
         $scope.$apply();
     });
 
-
-
-
-    $scope.$watch('lands.length', function() {
-        $scope.refreshLandOverlays();
-    });
-
-    // Views
-    $scope.landListView = function() {
-        $scope.lands = $scope.Land.query();
-        $scope.drawingManager.setOptions({
-            drawingMode: null,
-            drawingControl: false
-        });
-    };
-
-    $scope.landAddView = function() {
-        $scope.hideLandOverlays();
-        $scope.activeLand = new $scope.Land();
-        $scope.drawingManager.setOptions({drawingControl: true});
-    };
-
-    $scope.landEditView = function(land) {
-        $scope.hideLandOverlays();
-        $scope.activeLand = angular.copy(land);
-        $scope.drawingManager.setOptions({drawingControl: true});
-
-        var location = land.location.split(',');
-        var latLng = new google.maps.LatLng(location[0], location[1]);
-        var marker = new google.maps.Marker({
-            draggable: true,
-            map: $scope.map,
-            position: latLng,
-            title: land.name
-        });
-
-        google.maps.event.addListener(marker, 'dragend', function() {
-            console.log('new position: ' + marker.getPosition().toString());
-            var position = marker.getPosition();
-            $scope.activeLand.location = position.lat() + ',' + position.lng();
-
-            $scope.activeLand.json = JSON.stringify(marker.toObj());
-
-            $scope.$apply();
-        });
-    };
-
-
-
-    $scope.deleteLand = function(land) {
-        land.$delete();
-    };
-
-
-
-    // Land Overlays model and functions
-    $scope.landOverlays = [];
-
-    $scope.deleteLandOverlays = function() {
-        angular.forEach($scope.landOverlays, function(landOverlay) {
-            landOverlay.setMap(null);
-        });
-        $scope.landOverlays.length = 0;
-    };
-
-    $scope.hideLandOverlays = function() {
-        angular.forEach($scope.landOverlays, function(landOverlay) {
-            landOverlay.setMap(null);
-        });
-    };
-
-    $scope.showLandOverlays = function() {
-        angular.forEach($scope.landOverlays, function(landOverlay) {
-            landOverlay.setMap($scope.map);
-        });
-    };
-
-    $scope.addLandOverlays = function() {
-        angular.forEach($scope.lands, function(land) {
-            var location = land.location.split(',');
-            var latLng = new google.maps.LatLng(location[0], location[1]);
-            var marker = new google.maps.Marker({
-                icon: '/static/img/drw-ToolCircleLarge.png',
-                map: $scope.map,
-                position: latLng,
-                title: land.name
-            });
-            $scope.landOverlays.push(marker);
-        });
-    };
-
-    $scope.setBounds = function() {
-        var bounds = new google.maps.LatLngBounds();
-        angular.forEach($scope.landOverlays, function(overlay) {
-            bounds.extend(overlay.position);
-        });
-        $scope.map.fitBounds(bounds);
-    };
-
-    $scope.refreshLandOverlays = function() {
-        $scope.deleteLandOverlays();
-        $scope.addLandOverlays();
-        $scope.setBounds();
-    };
-
-
-    $scope.landGeom = [];
-
-
-    $scope.geomToObj = function(geom) {
-        var result = [];
-        for (i in geom) {
-            result.push(geom[i].toObj());
-        }
-        return result;
-    };
-
-    $scope.stringifying = function(geom) {
-        return JSON.stringify($scope.geomToObj(geom));
-    };
-
-
-};
-
-
-function LandListCtrl($scope) {
-    $scope.landListView();
-}
-
-function LandAddCtrl($scope, $location) {
-    $scope.landAddView();
-
     $scope.saveLand = function() {
         $scope.activeLand.$save({}, function() {
-            $scope.lands = $scope.Land.query();
             $location.path('/');
         }, function() {
             console.log('error adding');
@@ -224,14 +145,46 @@ function LandAddCtrl($scope, $location) {
     };
 }
 
-function LandEditCtrl($scope, $routeParams, $location) {
-    var land = $scope.Land.get({key: $routeParams.key}, function() {
-        $scope.landEditView(land);
+function LandEditCtrl($scope, $location, $routeParams) {
+
+
+    $scope.$location = $location;
+
+    $scope.$on('$beforeRouteChange', function() {
+        $scope.deleteOverlays($scope.overlays);
+    });
+
+
+    $scope.drawingManager.setOptions({drawingControl: true});
+
+
+    $scope.overlays = [];
+
+
+    $scope.$watch('overlays.length', function() {
+        $scope.activeLand.geom = serializeOverlays($scope.overlays);
+        var center = getBounds($scope.overlays).getCenter();
+        $scope.activeLand.location = center.lat() + ',' + center.lng();
+    });
+
+    $scope.activeLand = $scope.Land.get({key: $routeParams.key}, function() {
+        $scope.overlays = deserializeOverlays($scope.activeLand.geom);
+        $scope.showOverlays($scope.overlays);
+        $scope.map.fitBounds(getBounds($scope.overlays));
+    });
+
+    google.maps.event.addListener($scope.drawingManager, 'markercomplete', function(marker) {
+        $scope.overlays.push(marker);
+        $scope.$apply();
+    });
+
+    google.maps.event.addListener($scope.drawingManager, 'circlecomplete', function(circle) {
+        $scope.overlays.push(circle);
+        $scope.$apply();
     });
 
     $scope.saveLand = function() {
         $scope.activeLand.$update({}, function() {
-            $scope.lands = $scope.Land.query();
             $location.path('/');
         }, function() {
             console.log('error updating');

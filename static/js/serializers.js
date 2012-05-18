@@ -1,3 +1,9 @@
+google.maps.Marker.prototype.getBounds = function() {
+    var position = this.getPosition();
+    return new google.maps.LatLngBounds(position, position);
+};
+
+
 google.maps.Marker.prototype.toObj = function() {
     var position = this.getPosition();
     return {
@@ -28,3 +34,29 @@ google.maps.Circle.fromObj = function(obj) {
     });
 };
 
+
+
+function serializeOverlays(overlays) {
+    return JSON.stringify(overlays.map(function(overlay) {
+        return overlay.toObj();
+    }));
+}
+
+function deserializeOverlays(serializedOverlays) {
+    return JSON.parse(serializedOverlays).map(function(obj) {
+        var type = obj.type;
+        if (type == 'Point') {
+            return google.maps.Marker.fromObj(obj);
+        } else if (type == 'Circle') {
+            return google.maps.Circle.fromObj(obj);
+        }
+    });
+}
+
+function getBounds(overlays) {
+    var bounds = new google.maps.LatLngBounds();
+    overlays.forEach(function(overlay) {
+        bounds.union(overlay.getBounds());
+    });
+    return bounds;
+}
