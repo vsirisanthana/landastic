@@ -16,7 +16,7 @@ angular.module('Landastic', ['ngResource']).
 //    }]);
 
 
-function LandsCtrl($scope, $resource) {
+function MainCtrl($scope, $resource) {
 
     // Resources
     $scope.Land = $resource('/api/lands/:key', {key: '@key'}, {update: {method: 'PUT'}});
@@ -120,7 +120,7 @@ function LandAddCtrl($scope, $location) {
     $scope.overlays = [];
 
     $scope.$watch('overlays.length', function() {
-        $scope.activeLand.geom = serializeOverlays($scope.overlays);
+        $scope.activeLand.features = serializeOverlays($scope.overlays);
 
         var center = getBounds($scope.overlays).getCenter();
         $scope.activeLand.location = center.lat() + ',' + center.lng();
@@ -162,13 +162,13 @@ function LandEditCtrl($scope, $location, $routeParams) {
 
 
     $scope.$watch('overlays.length', function() {
-        $scope.activeLand.geom = serializeOverlays($scope.overlays);
+        $scope.activeLand.features = serializeOverlays($scope.overlays);
         var center = getBounds($scope.overlays).getCenter();
         $scope.activeLand.location = center.lat() + ',' + center.lng();
     });
 
     $scope.activeLand = $scope.Land.get({key: $routeParams.key}, function() {
-        $scope.overlays = deserializeOverlays($scope.activeLand.geom);
+        $scope.overlays = deserializeOverlays($scope.activeLand.features);
         $scope.showOverlays($scope.overlays);
         $scope.map.fitBounds(getBounds($scope.overlays));
     });
