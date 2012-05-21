@@ -1,4 +1,3 @@
-import logging
 import simplejson
 import webapp2
 
@@ -32,17 +31,17 @@ class LandInstanceHandler(webapp2.RequestHandler):
                 body = simplejson.loads(self.request.body)
                 name = body['name']
                 location = body['location']
-                geom = body['geom']
+                features = body['features']
             else:
                 name = self.request.get('name')
                 location = self.request.get('location')
-                geom = self.request.get('geom')
+                features = self.request.get('features')
 
             lat, lng = [l.strip() for l in location.split(',')]
 
             land.name = name
             land.location = db.GeoPt(lat, lng)
-            land.geom = geom
+            land.features = features
             land.put()
 
             self.response.headers['Content-Type'] = 'application/json'
@@ -72,15 +71,15 @@ class LandListOrCreateHandler(webapp2.RequestHandler):
             body = simplejson.loads(self.request.body)
             name = body['name']
             location = body['location']
-            geom = body['geom']
+            features = body['features']
         else:
             name = self.request.get('name')
             location = self.request.get('location')
-            geom = self.request.get('geom')
+            features = self.request.get('features')
 
         lat, lng = [l.strip() for l in location.split(',')]
 
-        land = Land(name=name, location=db.GeoPt(lat, lng), geom=geom)
+        land = Land(name=name, location=db.GeoPt(lat, lng), features=features)
         land.put()
 
         self.response.set_status(201)
