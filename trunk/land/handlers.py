@@ -8,7 +8,7 @@ from .models import Land
 from .utils import to_dict
 
 
-class InstanceLandHandler(webapp2.RequestHandler):
+class LandInstanceHandler(webapp2.RequestHandler):
 
 #    def __init__(self, resource):
 #        self.resource = resource
@@ -59,7 +59,7 @@ class InstanceLandHandler(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'application/json'
 
 
-class ListOrCreateLandHandler(webapp2.RequestHandler):
+class LandListOrCreateHandler(webapp2.RequestHandler):
 
     def get(self):
         lands = [to_dict(land) for land in Land.gql('')]

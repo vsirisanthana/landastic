@@ -1,11 +1,11 @@
 import webapp2
 
-from .handlers import InstanceLandHandler, ListOrCreateLandHandler
+from .handlers import LandInstanceHandler, LandListOrCreateHandler
 
 
 app = webapp2.WSGIApplication([
-        ('/api/lands/?', ListOrCreateLandHandler),
-        ('/api/lands/([\w-]*)/?', InstanceLandHandler),
+        ('/api/lands/?', LandListOrCreateHandler),
+        ('/api/lands/([\w-]*)/?', LandInstanceHandler),
 
 #        ('/.*', )
     ],
