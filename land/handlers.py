@@ -61,7 +61,7 @@ class LandInstanceHandler(webapp2.RequestHandler):
 class LandListOrCreateHandler(webapp2.RequestHandler):
 
     def get(self):
-        lands = [to_dict(land) for land in Land.gql('')]
+        lands = [to_dict(land) for land in Land.gql('ORDER BY last_modified DESC')]
         self.response.headers['Content-Type'] = 'application/json'
 #        self.response.out.write(simplejson.dumps({'results': lands}))
         self.response.out.write(simplejson.dumps(lands))
