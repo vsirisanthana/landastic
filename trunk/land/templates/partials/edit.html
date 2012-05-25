@@ -8,20 +8,41 @@
         <div class="control-group">
             <label class="control-label" for="land_name">Name</label>
             <div class="controls">
-                <input type="text" id="land_name" ng-model="activeLand.name" name="name" required/>
+                <input type="text" id="land_name" ng-model="land.name" name="name" required/>
             </div>
         </div>
         <div class="control-group">
             <label class="control-label" for="land_location">Location</label>
             <div class="controls">
-                <input type="text" id="land_location" ng-model="activeLand.location" name="location" required/>
+                <input type="text" id="land_location" ng-model="land.location" name="location" required/>
             </div>
         </div>
-        <input type="hidden" ng-model="activeLand.key"/>
-        <textarea class="input-xlarge" rows="8" ng-model="activeLand.features"></textarea>
+        <input type="hidden" ng-model="land.key"/>
+        <textarea class="input-xlarge" rows="8" ng-model="land.features"/>
     </fieldset>
+    <p>Created: {{ land.created | date }}</p>
+    <p>Created by: {{ land.created_by }}</p>
+    <p>Last modified: {{ land.last_modified | date }}</p>
+    <p>Last modified by: {{ land.last_modified_by }}</p>
+    <!--<fieldset>-->
+        <!--<legend>Log</legend>-->
+        <!--<div class="control-group">-->
+            <!--<label class="control-label" for="land_created">Created</label>-->
+            <!--<div class="controls">-->
+                <!--<input type="text" id="land_created" ng-model="land.created" name="created" required/>-->
+            <!--</div>-->
+        <!--</div>-->
+        <!--<div class="control-group">-->
+            <!--<label class="control-label" for="land_created_by">Created</label>-->
+            <!--<div class="controls">-->
+                <!--<input type="text" id="land_created_by" ng-model="land.created_by" name="created_by" required/>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</fieldset>-->
     <div class="form-actions">
         <button type="submit" class="btn btn-primary" ng-click="saveLand()">Save</button>
+        <button type="submit" class="btn btn-danger" ng-show="land.deletable" ng-click="deleteLand()">Delete</button>
         <button type="reset" class="btn" ng-click="$location.path('#/')">Cancel</button>
     </div>
 </form>
+<div id='info'>Delete</div>
