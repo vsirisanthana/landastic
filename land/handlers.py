@@ -56,6 +56,7 @@ class LandInstanceHandler(webapp2.RequestHandler):
             land.location = db.GeoPt(lat, lng)
             land.features = features
             land.last_modified_by = user
+            if not land.created_by: land.created_by = user
             land.put()
 
             self.response.headers['Content-Type'] = 'application/json'
