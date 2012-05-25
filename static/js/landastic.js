@@ -3,9 +3,9 @@
 angular.module('Landastic', ['ngResource']).
     config(['$routeProvider', function($routeProvider) {
         $routeProvider.
-            when('/', {template: 'partials/list.html', controller: LandListCtrl}).
-            when('/add', {template: 'partials/edit.html', controller: LandAddCtrl}).
-            when('/edit/:key', {template: 'partials/edit.html', controller: LandEditCtrl}).
+            when('/', {template: '/templates/partials/list.html', controller: LandListCtrl}).
+            when('/add', {template: '/templates/partials/edit.html', controller: LandAddCtrl}).
+            when('/edit/:key', {template: '/templates/partials/edit.html', controller: LandEditCtrl}).
             otherwise({redirectTo: '/'});
     }]);
 

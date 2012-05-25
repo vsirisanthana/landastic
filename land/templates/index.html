@@ -4,18 +4,18 @@
     <title>Landastic</title>
     <meta name="fragment" content="!" />
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/static/lib/bootstrap/css/bootstrap.min.css" />
     <style type="text/css">
-        /*html { height: 100%; }*/
-        /*body { background-color: #999; }*/
+            /*html { height: 100%; }*/
+            /*body { background-color: #999; }*/
         #content { position: absolute; top: 40px; right: 0px; bottom: 0px; left: 0px; }
         #map_row { height: 100%; }
         #map_span { height: 100%; }
         #map_canvas { height: 100%; }
         #map_canvas img { max-width: none; }
-        /*#lands_span { height: 100%; overflow-y: scroll; }*/
-        /*#lands_action { margin: 10px 0px 10px 0px; }*/
-        /*#land_add_span { padding: 2px 20px 20px 20px;}*/
+            /*#lands_span { height: 100%; overflow-y: scroll; }*/
+            /*#lands_action { margin: 10px 0px 10px 0px; }*/
+            /*#land_add_span { padding: 2px 20px 20px 20px;}*/
     </style>
 
 </head>
@@ -31,18 +31,19 @@
             <a class="brand" href="#">Landastic</a>
             <div class="nav-collapse">
                 <ul class="nav pull-right">
-                    <li><a ng-click="changeLocation()">Welcome <strong>Anonymous</strong></a></li>
+                    <li><a href="#">Welcome <strong>{$ nickname $}</strong></a></li>
+                    <li><a href="{$ logout_url $}">Logout</a></li>
                     <li class="divider-vertical"></li>
                     <li><a href="#/add">Add</a></li>
                     <!--<li class="dropdown">-->
-                        <!--<a class="dropdown-toggle" data-toggle="dropdown" href="#">Sort by <b class="caret"></b></a>-->
-                        <!--<ul class="dropdown-menu">-->
-                            <!--<li><a href="#">Action</a></li>-->
-                            <!--<li><a href="#">Another action</a></li>-->
-                            <!--<li><a href="#">Something else here</a></li>-->
-                            <!--<li class="divider"></li>-->
-                            <!--<li><a href="#">Separated link</a></li>-->
-                        <!--</ul>-->
+                    <!--<a class="dropdown-toggle" data-toggle="dropdown" href="#">Sort by <b class="caret"></b></a>-->
+                    <!--<ul class="dropdown-menu">-->
+                    <!--<li><a href="#">Action</a></li>-->
+                    <!--<li><a href="#">Another action</a></li>-->
+                    <!--<li><a href="#">Something else here</a></li>-->
+                    <!--<li class="divider"></li>-->
+                    <!--<li><a href="#">Separated link</a></li>-->
+                    <!--</ul>-->
                     <!--</li>-->
                 </ul>
             </div>
@@ -57,15 +58,15 @@
 </div>
 
 <!--<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>-->
-<script type="text/javascript" src="lib/jquery/jquery-1.7.2.min.js"></script>
-<script type="text/javascript" src="lib/bootstrap/js/bootstrap.js"></script>
-<script type="text/javascript" src="lib/angular/angular-1.0.0rc8.min.js"></script>
-<script type="text/javascript" src="lib/angular/angular-resource-1.0.0rc8.min.js"></script>
+<script type="text/javascript" src="/static/lib/jquery/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="/static/lib/bootstrap/js/bootstrap.js"></script>
+<script type="text/javascript" src="/static/lib/angular/angular-1.0.0rc8.min.js"></script>
+<script type="text/javascript" src="/static/lib/angular/angular-resource-1.0.0rc8.min.js"></script>
 <script type="text/javascript"
         src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBf9_6dgjtdzdn1lqYPWn209VPUN6Kv040&sensor=false&libraries=drawing">
 </script>
 <!--<script type="text/javascript" src="js/services.js"></script>-->
-<script type="text/javascript" src="js/serializers.js"></script>
-<script type="text/javascript" src="js/landastic.js"></script>
+<script type="text/javascript" src="/static/js/serializers.js"></script>
+<script type="text/javascript" src="/static/js/landastic.js"></script>
 </body>
 </html>
