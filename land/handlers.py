@@ -1,14 +1,15 @@
+import os
 import simplejson
-import webapp2
 
+import jinja2
+import webapp2
+from google.appengine.api import users
 from google.appengine.ext import db
+from webapp2_extras.appengine.users import login_required
 
 from .models import Land
 from .utils import to_dict
 
-
-import jinja2
-import os
 
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), 'templates')),
@@ -47,11 +48,14 @@ class LandInstanceHandler(webapp2.RequestHandler):
                 location = self.request.get('location')
                 features = self.request.get('features')
 
+            user = users.get_current_user()
+
             lat, lng = [l.strip() for l in location.split(',')]
 
             land.name = name
             land.location = db.GeoPt(lat, lng)
             land.features = features
+            land.last_modified_by = user
             land.put()
 
             self.response.headers['Content-Type'] = 'application/json'
@@ -68,17 +72,7 @@ class LandInstanceHandler(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'application/json'
 
 
-from google.appengine.api import users
-#def login_required(method):
-#    user = users.get_current_user()
-#    if user:
-#        return method
-#    else:
-#        return False
 
-from webapp2_extras.appengine.users import login_required
-
-#from google.appengine.ext.webapp.util import login_required
 
 class LandListOrCreateHandler(webapp2.RequestHandler):
 
@@ -88,7 +82,7 @@ class LandListOrCreateHandler(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'application/json'
 #        self.response.out.write(simplejson.dumps({'results': lands}))
 
-        url = users.create_logout_url(self.request.uri)
+#        url = users.create_logout_url(self.request.uri)
 #        lands.append(url)
 
         self.response.out.write(simplejson.dumps(lands))
@@ -104,9 +98,12 @@ class LandListOrCreateHandler(webapp2.RequestHandler):
             location = self.request.get('location')
             features = self.request.get('features')
 
+        user = users.get_current_user()
+
+
         lat, lng = [l.strip() for l in location.split(',')]
 
-        land = Land(name=name, location=db.GeoPt(lat, lng), features=features)
+        land = Land(name=name, location=db.GeoPt(lat, lng), features=features, created_by=user, last_modified_by=user)
         land.put()
 
         self.response.set_status(201)
