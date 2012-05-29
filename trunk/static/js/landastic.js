@@ -200,6 +200,7 @@ function LandEditCtrl($scope, $routeParams, $http, $compile) {
 
     $scope.overlays = new OverlayArray();
     $scope.land = $scope.Land.get({key: $routeParams.key}, function() {
+        $scope.land.deletable = true;
         $scope.overlays = OverlayArray.fromObj(JSON.parse($scope.land.features));
         $scope.overlays.setMap($scope.map);
         $scope.map.fitBounds($scope.overlays.getBounds());
