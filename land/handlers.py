@@ -1,3 +1,4 @@
+import logging
 import os
 import simplejson
 
@@ -16,6 +17,9 @@ jinja_environment = jinja2.Environment(
     variable_start_string='{$',
     variable_end_string='$}',
 )
+
+
+
 
 
 class LandInstanceHandler(webapp2.RequestHandler):
@@ -55,8 +59,8 @@ class LandInstanceHandler(webapp2.RequestHandler):
             land.name = name
             land.location = db.GeoPt(lat, lng)
             land.features = features
-            land.last_modified_by = user
-            if not land.created_by: land.created_by = user
+#            land.last_modified_by = user
+#            if not land.created_by: land.created_by = user
             land.put()
 
             self.response.headers['Content-Type'] = 'application/json'
@@ -73,6 +77,20 @@ class LandInstanceHandler(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'application/json'
 
 
+#class ListOrCreateHandler(webapp2.RequestHandler):
+#
+#    def _parse(self):
+#        content_type = self.request.content_type
+#        if content_type == 'application/json':
+#            self.request.data = simplejson.loads(self.request.body)
+#
+#    @property
+#    def CONTENT(self):
+#        if not hasattr(self, '_content'):
+#            self._content = self._parse()
+#        return self._content
+
+
 
 
 class LandListOrCreateHandler(webapp2.RequestHandler):
@@ -81,11 +99,6 @@ class LandListOrCreateHandler(webapp2.RequestHandler):
     def get(self):
         lands = [to_dict(land) for land in Land.gql('ORDER BY last_modified DESC')]
         self.response.headers['Content-Type'] = 'application/json'
-#        self.response.out.write(simplejson.dumps({'results': lands}))
-
-#        url = users.create_logout_url(self.request.uri)
-#        lands.append(url)
-
         self.response.out.write(simplejson.dumps(lands))
 
     def post(self):
@@ -104,7 +117,7 @@ class LandListOrCreateHandler(webapp2.RequestHandler):
 
         lat, lng = [l.strip() for l in location.split(',')]
 
-        land = Land(name=name, location=db.GeoPt(lat, lng), features=features, created_by=user, last_modified_by=user)
+        land = Land(name=name, location=location, features=features)
         land.put()
 
         self.response.set_status(201)
