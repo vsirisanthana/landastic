@@ -7,7 +7,7 @@
     <fieldset>
         <input type="hidden" ng-model="land.key"/>
         <input type="hidden" ng-model="land.location" required/>
-        <!--<input type="hidden" ng-model="land.features" required/>-->
+        <input type="hidden" ng-model="land.features" required/>
     </fieldset>
     <fieldset>
         <legend>Land</legend>
@@ -17,20 +17,20 @@
                 <input type="text" id="land_name" ng-model="land.name" required/>
             </div>
         </div>
-        <!--<div class="control-group">-->
-            <!--<label class="control-label" for="land_location">Location</label>-->
-            <!--<div class="controls">-->
-                <!--<input type="text" id="land_location" ng-model="land.location" ng-disabled="true" required/>-->
-            <!--</div>-->
-        <!--</div>-->
+        <div class="control-group">
+            <label class="control-label" for="land_area">Area</label>
+            <div class="controls">
+                <input type="text" id="land_area" ng-model="land.area"/>
+            </div>
+        </div>
 
-        <textarea class="input-xlarge" rows="8" ng-model="land.features"/>
+        <!--<textarea class="input-xlarge" rows="8" ng-model="land.features"/>-->
     </fieldset>
 
-    <p>Created: {{ land.created | date }}</p>
-    <p>Created by: {{ land.created_by }}</p>
-    <p>Last modified: {{ land.last_modified | date }}</p>
-    <p>Last modified by: {{ land.last_modified_by }}</p>
+    <!--<p>Created: {{ land.created | date }}</p>-->
+    <!--<p>Created by: {{ land.created_by }}</p>-->
+    <!--<p>Last modified: {{ land.last_modified | date }}</p>-->
+    <!--<p>Last modified by: {{ land.last_modified_by }}</p>-->
     <!--<fieldset>-->
         <!--<legend>Log</legend>-->
         <!--<div class="control-group">-->

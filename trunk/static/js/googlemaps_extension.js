@@ -50,15 +50,15 @@ OverlayArray.prototype.remove = function(overlay) {
     }
 };
 
-OverlayArray.prototype.setEditable = function(editable) {
-    this.forEach(function(overlay) {
-        if (overlay instanceof google.maps.Marker) {
-            overlay.setDraggable(editable);
-        } else {
-            overlay.setEditable(editable);
-        }
-    });
-};
+//OverlayArray.prototype.setEditable = function(editable) {
+//    this.forEach(function(overlay) {
+//        if (overlay instanceof google.maps.Marker) {
+//            overlay.setDraggable(editable);
+//        } else {
+//            overlay.setEditable(editable);
+//        }
+//    });
+//};
 
 OverlayArray.prototype.setMap = function(map) {
     this.forEach(function(overlay) {
@@ -66,22 +66,22 @@ OverlayArray.prototype.setMap = function(map) {
     });
 };
 
-OverlayArray.prototype.addListener = function(handler) {
-    this.forEach(function(overlay) {
-        if (overlay instanceof google.maps.Marker) {
-            google.maps.event.addListener(overlay, 'dragend', handler);
-        } else if (overlay instanceof google.maps.Circle) {
-            google.maps.event.addListener(overlay, 'radius_changed', handler);
-            google.maps.event.addListener(overlay, 'center_changed', handler);
-        } else if (overlay instanceof google.maps.Polygon) {
-            angular.forEach(overlay.getPaths(), function(path) {
-                google.maps.event.addListener(path, 'set_at', handler);
-                google.maps.event.addListener(path, 'insert_at', handler);
-                google.maps.event.addListener(path, 'remove_at', handler);
-            });
-        }
-    });
-};
+//OverlayArray.prototype.addListener = function(handler) {
+//    this.forEach(function(overlay) {
+//        if (overlay instanceof google.maps.Marker) {
+//            google.maps.event.addListener(overlay, 'dragend', handler);
+//        } else if (overlay instanceof google.maps.Circle) {
+//            google.maps.event.addListener(overlay, 'radius_changed', handler);
+//            google.maps.event.addListener(overlay, 'center_changed', handler);
+//        } else if (overlay instanceof google.maps.Polygon) {
+//            angular.forEach(overlay.getPaths(), function(path) {
+//                google.maps.event.addListener(path, 'set_at', handler);
+//                google.maps.event.addListener(path, 'insert_at', handler);
+//                google.maps.event.addListener(path, 'remove_at', handler);
+//            });
+//        }
+//    });
+//};
 
 OverlayArray.prototype.toObj = function() {
     return this.map(function(overlay) {
