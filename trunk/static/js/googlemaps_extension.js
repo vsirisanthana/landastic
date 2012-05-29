@@ -10,11 +10,12 @@ google.maps.Polygon.prototype.getBounds = function() {
     return bounds;
 };
 
+google.maps.Polygon.prototype.getCenter = function() {
+    return this.getBounds().getCenter();
+}
+
 
 // Define OverlayArray
-OverlayArray.prototype = new Array();
-
-
 function OverlayArray(overlays) {
     var self = this;
     if (overlays) {
@@ -23,6 +24,7 @@ function OverlayArray(overlays) {
         })
     }
 }
+OverlayArray.prototype = new Array();
 
 OverlayArray.prototype.clear = function() {
     this.setMap(null);
@@ -39,6 +41,13 @@ OverlayArray.prototype.getBounds = function() {
         }
     });
     return bounds;
+};
+
+OverlayArray.prototype.remove = function(overlay) {
+    var index = this.indexOf(overlay);
+    if (index != -1) {
+        this.splice(index, 1);
+    }
 };
 
 OverlayArray.prototype.setEditable = function(editable) {
@@ -92,3 +101,5 @@ OverlayArray.fromObj = function(objs) {
         }
     }));
 };
+
+

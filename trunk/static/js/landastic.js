@@ -36,15 +36,6 @@ function MainCtrl($scope, $location, $resource) {
                 google.maps.drawing.OverlayType.CIRCLE,
                 google.maps.drawing.OverlayType.POLYGON
             ]
-        },
-        markerOptions: {
-            draggable: true
-        },
-        circleOptions: {
-            editable: true
-        },
-        polygonOptions: {
-            editable: true
         }
     });
     $scope.drawingManager.setMap($scope.map);
@@ -59,7 +50,6 @@ function LandBaseCtrl($scope) {
 }
 
 function LandListCtrl($scope) {
-
     LandBaseCtrl($scope);
 
     $scope.lands = $scope.Land.query(function() {
@@ -83,10 +73,9 @@ function LandListCtrl($scope) {
 
     google.maps.event.clearListeners($scope.drawingManager, 'markercomplete');
     google.maps.event.clearListeners($scope.drawingManager, 'circlecomplete');
-
 }
 
-function LandAddEditBaseCtrl($scope) {
+function LandAddEditBaseCtrl($scope, $http, $compile) {
     LandBaseCtrl($scope);
 
     $scope.$on('overlaysChange', function() {
@@ -101,40 +90,97 @@ function LandAddEditBaseCtrl($scope) {
     };
 
     google.maps.event.addListener($scope.drawingManager, 'markercomplete', function(marker) {
-        google.maps.event.addListener(marker, 'dragend', $scope.broadcastOverlaysChangeEvent);
-        google.maps.event.addListener(marker, 'click', function() {
-            var infoWindow = new google.maps.InfoWindow({
-                content: '<button class="btn">Delete</button>'
-            });
-            infoWindow.open($scope.map, marker);
-        });
+        $scope.setMarkerEditable(marker);
         $scope.overlays.push(marker);
         $scope.broadcastOverlaysChangeEvent();
     });
 
     google.maps.event.addListener($scope.drawingManager, 'circlecomplete', function(circle) {
-        google.maps.event.addListener(circle, 'center_changed', $scope.broadcastOverlaysChangeEvent);
-        google.maps.event.addListener(circle, 'radius_changed', $scope.broadcastOverlaysChangeEvent);
+        $scope.setCircleEditable(circle);
         $scope.overlays.push(circle);
         $scope.broadcastOverlaysChangeEvent();
     });
 
     google.maps.event.addListener($scope.drawingManager, 'polygoncomplete', function(polygon) {
-        angular.forEach(polygon.getPaths(), function(path) {
-            google.maps.event.addListener(path, 'set_at', $scope.broadcastOverlaysChangeEvent);
-            google.maps.event.addListener(path, 'insert_at', $scope.broadcastOverlaysChangeEvent);
-            google.maps.event.addListener(path, 'remove_at', $scope.broadcastOverlaysChangeEvent);
-        });
+        $scope.setPolygonEditable(polygon);
         $scope.overlays.push(polygon);
         $scope.broadcastOverlaysChangeEvent();
     });
 
     $scope.drawingManager.setOptions({drawingControl: true});
+
+    $scope.deleteActiveOverlay = function() {
+        var conformation = confirm('Are you sure you want to delete this feature?');
+        if (conformation && $scope.activeOverlay) {
+            $scope.overlays.remove($scope.activeOverlay);
+            $scope.activeOverlay.setMap(null);
+            $scope.activeOverlay = null;
+            $scope.activeInfoWindow.close();
+            $scope.$broadcast('overlaysChange');
+        }
+    }
+
+    $scope.getAndShowInfoWindow = function(overlay, position) {
+        $http.get('/templates/partials/infoWindow.html').success(function(data, status, headers) {
+            $scope.activeOverlay = overlay;
+            if ($scope.activeInfoWindow) {
+                $scope.activeInfoWindow.close();
+            }
+            $scope.activeInfoWindow = new google.maps.InfoWindow({
+                content: $compile(data)($scope)[0],
+                position: position
+            });
+            $scope.activeInfoWindow.open($scope.map);
+        });
+    };
+
+    $scope.setOverlayEditable = function(overlay) {
+        if (overlay instanceof google.maps.Marker) {
+            $scope.setMarkerEditable(overlay);
+        } else if (overlay instanceof google.maps.Circle) {
+            $scope.setCircleEditable(overlay);
+        } else if (overlay instanceof google.maps.Polygon) {
+            $scope.setPolygonEditable(overlay);
+        }
+    };
+
+    $scope.setMarkerEditable = function(marker) {
+        marker.setDraggable(true);
+        google.maps.event.addListener(marker, 'dragend', $scope.broadcastOverlaysChangeEvent);
+        google.maps.event.addListener(marker, 'click', function() {
+            $scope.getAndShowInfoWindow(marker, marker.getPosition());
+        });
+    };
+
+    $scope.setCircleEditable = function(circle) {
+        google.maps.event.addListener(circle, 'mouseover', function() { circle.setEditable(true); });
+        google.maps.event.addListener(circle, 'mouseout', function() { circle.setEditable(false); });
+        google.maps.event.addListener(circle, 'center_changed', $scope.broadcastOverlaysChangeEvent);
+        google.maps.event.addListener(circle, 'radius_changed', $scope.broadcastOverlaysChangeEvent);
+        google.maps.event.addListener(circle, 'click', function(mouseEvent) {
+            $scope.getAndShowInfoWindow(circle, mouseEvent.latLng);
+        })
+    };
+
+    $scope.setPolygonEditable = function(polygon) {
+        google.maps.event.addListener(polygon, 'mouseover', function() { polygon.setEditable(true); });
+        google.maps.event.addListener(polygon, 'mouseout', function() { polygon.setEditable(false); });
+
+        angular.forEach(polygon.getPaths(), function(path) {
+            google.maps.event.addListener(path, 'set_at', $scope.broadcastOverlaysChangeEvent);
+            google.maps.event.addListener(path, 'insert_at', $scope.broadcastOverlaysChangeEvent);
+            google.maps.event.addListener(path, 'remove_at', $scope.broadcastOverlaysChangeEvent);
+        });
+
+        google.maps.event.addListener(polygon, 'click', function(mouseEvent) {
+            $scope.getAndShowInfoWindow(polygon, mouseEvent.latLng);
+        })
+    };
 }
 
-function LandAddCtrl($scope) {
+function LandAddCtrl($scope, $http, $compile) {
 
-    LandAddEditBaseCtrl($scope);
+    LandAddEditBaseCtrl($scope, $http, $compile);
 
     $scope.land = new $scope.Land();
     $scope.overlays = new OverlayArray();
@@ -148,29 +194,17 @@ function LandAddCtrl($scope) {
     };
 }
 
-function LandEditCtrl($scope, $routeParams) {
+function LandEditCtrl($scope, $routeParams, $http, $compile) {
 
-    LandAddEditBaseCtrl($scope);
+    LandAddEditBaseCtrl($scope, $http, $compile);
 
     $scope.overlays = new OverlayArray();
     $scope.land = $scope.Land.get({key: $routeParams.key}, function() {
-        $scope.land.deletable = true;
         $scope.overlays = OverlayArray.fromObj(JSON.parse($scope.land.features));
-        $scope.overlays.setEditable(true);
-        $scope.overlays.addListener($scope.broadcastOverlaysChangeEvent);
         $scope.overlays.setMap($scope.map);
         $scope.map.fitBounds($scope.overlays.getBounds());
+        angular.forEach($scope.overlays, function(overlay) { $scope.setOverlayEditable(overlay) });
 
-        angular.forEach($scope.overlays, function(overlay) {
-            if (overlay instanceof google.maps.Marker) {
-                google.maps.event.addListener(overlay, 'click', function() {
-                    var infoWindow = new google.maps.InfoWindow({
-                        content: document.getElementById('info')
-                    });
-                    infoWindow.open($scope.map, overlay);
-                });
-            }
-        });
     });
 
     $scope.saveLand = function() {
@@ -188,4 +222,6 @@ function LandEditCtrl($scope, $routeParams) {
             console.log('error deleting');
         });
     };
+
+
 }
