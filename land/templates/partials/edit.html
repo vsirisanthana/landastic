@@ -7,7 +7,7 @@
     <fieldset>
         <input type="hidden" ng-model="land.key"/>
         <input type="hidden" ng-model="land.location" required/>
-        <input type="hidden" ng-model="land.features" required/>
+        <!--<input type="hidden" ng-model="land.features" required/>-->
     </fieldset>
     <fieldset>
         <legend>Land</legend>
@@ -24,7 +24,7 @@
             <!--</div>-->
         <!--</div>-->
 
-        <!--<textarea class="input-xlarge" rows="8" ng-model="land.features"/>-->
+        <textarea class="input-xlarge" rows="8" ng-model="land.features"/>
     </fieldset>
 
     <p>Created: {{ land.created | date }}</p>
@@ -52,4 +52,3 @@
         <button type="reset" class="btn" ng-click="$location.path('#/')">Cancel</button>
     </div>
 </form>
-<div id='info'>Delete</div>
