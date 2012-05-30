@@ -1,6 +1,6 @@
 import logging
 import os
-import simplejson
+import json
 
 import jinja2
 import webapp2
@@ -30,36 +30,40 @@ class LandInstanceHandler(webapp2.RequestHandler):
             land = Land.get(key)
         except db.BadKeyError:
             self.error(404)
-            self.response.out.write(simplejson.dumps('Error 404 Not Found'))
+            self.response.out.write(json.dumps('Error 404 Not Found'))
         else:
-            self.response.out.write(simplejson.dumps(to_dict(land)))
+            self.response.out.write(json.dumps(to_dict(land)))
         self.response.headers['Content-Type'] = 'application/json'
 
     @parse
     def put(self, key):
         try:
             land = Land.get(key)
+#            logging.error(dir(land))
         except db.BadKeyError:
             self.error(404)
             self.response.headers['Content-Type'] = 'application/json'
-            self.response.out.write(simplejson.dumps('Error 404 Not Found'))
+            self.response.out.write(json.dumps('Error 404 Not Found'))
         else:
             name = self.request.CONTENT.get('name')
             location = self.request.CONTENT.get('location')
             features = self.request.CONTENT.get('features')
-            area = float(self.request.CONTENT.get('area'))
-            price = float(self.request.CONTENT.get('price'))
+            area = self.request.CONTENT.get('area')
+            price = self.request.CONTENT.get('price')
+
             lat, lng = [l.strip() for l in location.split(',')]
+            if area: area = float(area)
+            if price: price = float(price)
 
             land.name = name
             land.location = db.GeoPt(lat, lng)
             land.features = features
-            land.area = area
+            if area: land.area = area
             land.price = price
             land.put()
 
             self.response.headers['Content-Type'] = 'application/json'
-            self.response.out.write(simplejson.dumps(to_dict(land)))
+            self.response.out.write(json.dumps(to_dict(land)))
 
     def delete(self, key):
         try:
@@ -67,7 +71,7 @@ class LandInstanceHandler(webapp2.RequestHandler):
         except db.BadKeyError:
             self.error(404)
             self.response.headers['Content-Type'] = 'application/json'
-            self.response.out.write(simplejson.dumps('Error 404 Not Found'))
+            self.response.out.write(json.dumps('Error 404 Not Found'))
         else:
             land.delete()
             self.response.set_status(204)
@@ -80,16 +84,19 @@ class LandListOrCreateHandler(webapp2.RequestHandler):
     def get(self):
         lands = [to_dict(land) for land in Land.gql('ORDER BY last_modified DESC')]
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(simplejson.dumps(lands))
+        self.response.out.write(json.dumps(lands))
 
     @parse
     def post(self):
         name = self.request.CONTENT.get('name')
         location = self.request.CONTENT.get('location')
         features = self.request.CONTENT.get('features')
-        area = float(self.request.CONTENT.get('area'))
-        price = float(self.request.CONTENT.get('price'))
+        area = self.request.CONTENT.get('area')
+        price = self.request.CONTENT.get('price')
+
         lat, lng = [l.strip() for l in location.split(',')]
+        if area: area = float(area)
+        if price: price = float(price)
 
         land = Land(
             name = name,
@@ -102,7 +109,7 @@ class LandListOrCreateHandler(webapp2.RequestHandler):
 
         self.response.set_status(201)
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(simplejson.dumps(to_dict(land)))
+        self.response.out.write(json.dumps(to_dict(land)))
 
 from webob.multidict import MultiDict
 

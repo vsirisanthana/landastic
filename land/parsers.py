@@ -1,5 +1,5 @@
 import logging
-import simplejson
+import json
 from urlparse import parse_qsl
 from webob.multidict import MultiDict
 
@@ -16,6 +16,6 @@ def parse(handler_method):
 def _parse(request):
     content_type = request.content_type
     if content_type == 'application/json':
-        request.CONTENT = simplejson.loads(request.body)
+        request.CONTENT = json.loads(request.body)
     elif content_type == 'application/x-www-form-urlencoded':
         request.CONTENT = MultiDict(parse_qsl(request.body))

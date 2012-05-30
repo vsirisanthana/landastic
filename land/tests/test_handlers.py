@@ -1,5 +1,5 @@
 import logging
-import simplejson
+import json
 import unittest
 import webtest
 
@@ -27,7 +27,7 @@ class TestLandListHandler(BaseTestHandler):
         response = self.testapp.get('/api/lands')
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(simplejson.loads(response.normal_body), [])
+        self.assertEqual(json.loads(response.normal_body), [])
 
     def test_list_one_land(self):
         land = Land(
@@ -43,7 +43,7 @@ class TestLandListHandler(BaseTestHandler):
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.content_type, 'application/json')
 
-        response_lands = simplejson.loads(response.normal_body)
+        response_lands = json.loads(response.normal_body)
         self.assertEqual(len(response_lands), 1)
 
         response_land = response_lands[0]
@@ -79,7 +79,7 @@ class TestLandListHandler(BaseTestHandler):
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.content_type, 'application/json')
 
-        response_lands = simplejson.loads(response.normal_body)
+        response_lands = json.loads(response.normal_body)
         self.assertEqual(len(response_lands), 2)
 
         response_land0 = response_lands[0]
@@ -104,7 +104,7 @@ class TestLandListHandler(BaseTestHandler):
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.content_type, 'application/json')
 
-        response_lands = simplejson.loads(response.normal_body)
+        response_lands = json.loads(response.normal_body)
         self.assertEqual(len(response_lands), 2)
 
         response_land0 = response_lands[0]
@@ -137,7 +137,7 @@ class TestLandCreateHandler(BaseTestHandler):
         self.assertEqual(response.status_int, 201)
         self.assertEqual(response.content_type, 'application/json')
 
-        response_land = simplejson.loads(response.normal_body)
+        response_land = json.loads(response.normal_body)
         self.assertEqual(response_land['name'], 'Wonderland')
         self.assertEqual(response_land['location'], '18.769937,99.003156')
         self.assertEqual(response_land['features'], 'NO VALIDATION YET')
@@ -152,7 +152,7 @@ class TestLandCreateHandler(BaseTestHandler):
         self.assertEqual(land.price, 10000000.50)
 
     def test_create_land__application_json(self):
-        response = self.testapp.post('/api/lands', simplejson.dumps({
+        response = self.testapp.post('/api/lands', json.dumps({
             'name': 'Wonderland',
             'location': '18.769937,99.003156',
             'features': 'NO VALIDATION YET',
@@ -162,7 +162,7 @@ class TestLandCreateHandler(BaseTestHandler):
         self.assertEqual(response.status_int, 201)
         self.assertEqual(response.content_type, 'application/json')
 
-        response_land = simplejson.loads(response.normal_body)
+        response_land = json.loads(response.normal_body)
         self.assertEqual(response_land['name'], 'Wonderland')
         self.assertEqual(response_land['location'], '18.769937,99.003156')
         self.assertEqual(response_land['features'], 'NO VALIDATION YET')
@@ -175,6 +175,25 @@ class TestLandCreateHandler(BaseTestHandler):
         self.assertEqual(land.features, 'NO VALIDATION YET')
         self.assertEqual(land.area, 100.50)
         self.assertEqual(land.price, 10000000.50)
+
+    def test_create_land__required_fields(self):
+        response = self.testapp.post('/api/lands', {
+            'name': 'Wonderland',
+            'location': '18.769937,99.003156',
+            'features': 'NO VALIDATION YET',
+        })
+        self.assertEqual(response.status_int, 201)
+        self.assertEqual(response.content_type, 'application/json')
+
+        response_land = json.loads(response.normal_body)
+        self.assertEqual(response_land['name'], 'Wonderland')
+        self.assertEqual(response_land['location'], '18.769937,99.003156')
+        self.assertEqual(response_land['features'], 'NO VALIDATION YET')
+
+        land = Land.get(response_land['key'])
+        self.assertEqual(land.name, 'Wonderland')
+        self.assertEqual(land.location, '18.769937,99.003156')
+        self.assertEqual(land.features, 'NO VALIDATION YET')
 
 
 class TestLandGetHandler(BaseTestHandler):
@@ -193,7 +212,7 @@ class TestLandGetHandler(BaseTestHandler):
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.content_type, 'application/json')
 
-        response_land = simplejson.loads(response.normal_body)
+        response_land = json.loads(response.normal_body)
         self.assertEqual(response_land['name'], 'Wonderland')
         self.assertEqual(response_land['location'], '18.769937,99.003156')
         self.assertEqual(response_land['features'], 'NO VALIDATION YET')
@@ -204,7 +223,7 @@ class TestLandGetHandler(BaseTestHandler):
         response = self.testapp.get('/api/lands/xxx', status=404)
         self.assertEqual(response.status_int, 404)
         self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(simplejson.loads(response.normal_body), 'Error 404 Not Found')
+        self.assertEqual(json.loads(response.normal_body), 'Error 404 Not Found')
 
 
 class TestLandPutHandler(BaseTestHandler):
@@ -229,7 +248,7 @@ class TestLandPutHandler(BaseTestHandler):
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.content_type, 'application/json')
 
-        response_land = simplejson.loads(response.normal_body)
+        response_land = json.loads(response.normal_body)
         self.assertEqual(response_land['name'], 'Neverland')
         self.assertEqual(response_land['location'], '20.769937,100.003156')
         self.assertEqual(response_land['features'], 'NO VALIDATION JUST YET')
@@ -253,7 +272,7 @@ class TestLandPutHandler(BaseTestHandler):
         )
         land.put()
 
-        response = self.testapp.put('/api/lands/%s' % str(land.key()), simplejson.dumps({
+        response = self.testapp.put('/api/lands/%s' % str(land.key()), json.dumps({
             'name': 'Neverland',
             'location': '20.769937,100.003156',
             'features': 'NO VALIDATION JUST YET',
@@ -263,7 +282,7 @@ class TestLandPutHandler(BaseTestHandler):
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.content_type, 'application/json')
 
-        response_land = simplejson.loads(response.normal_body)
+        response_land = json.loads(response.normal_body)
         self.assertEqual(response_land['name'], 'Neverland')
         self.assertEqual(response_land['location'], '20.769937,100.003156')
         self.assertEqual(response_land['features'], 'NO VALIDATION JUST YET')
@@ -277,11 +296,43 @@ class TestLandPutHandler(BaseTestHandler):
         self.assertEqual(land.area, 200.50)
         self.assertEqual(land.price, 20000000.50)
 
+    def test_put_land__required_fields(self):
+        land = Land(
+            name = 'Wonderland',
+            location = '18.769937,99.003156',
+            features = 'NO VALIDATION YET',
+            area = 100.50,
+            price = 10000000.50,
+        )
+        land.put()
+
+        response = self.testapp.put('/api/lands/%s' % str(land.key()), {
+            'name': 'Neverland',
+            'location': '20.769937,100.003156',
+            'features': 'NO VALIDATION JUST YET',
+        })
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.content_type, 'application/json')
+
+        response_land = json.loads(response.normal_body)
+        self.assertEqual(response_land['name'], 'Neverland')
+        self.assertEqual(response_land['location'], '20.769937,100.003156')
+        self.assertEqual(response_land['features'], 'NO VALIDATION JUST YET')
+        self.assertEqual(response_land['area'], 100.50)
+        self.assertEqual(response_land['price'], 10000000.50)
+
+        land = Land.get(land.key())
+        self.assertEqual(land.name, 'Neverland')
+        self.assertEqual(land.location, '20.769937,100.003156')
+        self.assertEqual(land.features, 'NO VALIDATION JUST YET')
+        self.assertEqual(land.area, 100.50)
+        self.assertEqual(land.price, 10000000.50)
+
     def test_put_land__not_found(self):
         response = self.testapp.put('/api/lands/xxx', status=404)
         self.assertEqual(response.status_int, 404)
         self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(simplejson.loads(response.normal_body), 'Error 404 Not Found')
+        self.assertEqual(json.loads(response.normal_body), 'Error 404 Not Found')
 
 
 class TestLandDeleteHandler(BaseTestHandler):
@@ -308,4 +359,4 @@ class TestLandDeleteHandler(BaseTestHandler):
         response = self.testapp.delete('/api/lands/xxx', status=404)
         self.assertEqual(response.status_int, 404)
         self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(simplejson.loads(response.normal_body), 'Error 404 Not Found')
+        self.assertEqual(json.loads(response.normal_body), 'Error 404 Not Found')
