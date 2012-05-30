@@ -1,3 +1,4 @@
+import logging
 import simplejson
 from urlparse import parse_qsl
 from webob.multidict import MultiDict

@@ -47,11 +47,15 @@ class LandInstanceHandler(webapp2.RequestHandler):
             name = self.request.CONTENT.get('name')
             location = self.request.CONTENT.get('location')
             features = self.request.CONTENT.get('features')
+            area = float(self.request.CONTENT.get('area'))
+            price = float(self.request.CONTENT.get('price'))
             lat, lng = [l.strip() for l in location.split(',')]
 
             land.name = name
             land.location = db.GeoPt(lat, lng)
             land.features = features
+            land.area = area
+            land.price = price
             land.put()
 
             self.response.headers['Content-Type'] = 'application/json'
@@ -83,15 +87,24 @@ class LandListOrCreateHandler(webapp2.RequestHandler):
         name = self.request.CONTENT.get('name')
         location = self.request.CONTENT.get('location')
         features = self.request.CONTENT.get('features')
+        area = float(self.request.CONTENT.get('area'))
+        price = float(self.request.CONTENT.get('price'))
         lat, lng = [l.strip() for l in location.split(',')]
 
-        land = Land(name=name, location=db.GeoPt(lat, lng), features=features)
+        land = Land(
+            name = name,
+            location = db.GeoPt(lat, lng),
+            features = features,
+            area = area,
+            price = price,
+        )
         land.put()
 
         self.response.set_status(201)
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(simplejson.dumps(to_dict(land)))
 
+from webob.multidict import MultiDict
 
 class AppHandler(webapp2.RequestHandler):
 
