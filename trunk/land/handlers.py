@@ -20,7 +20,27 @@ jinja_environment = jinja2.Environment(
 )
 
 
+loge = lambda *args: logging.error(*args)
+
+
+def clean_data(data, datatype):
+    pass
+
+def clean_float(data):
+    try:
+        float(data)
+    except TypeError:
+        pass
+
+
 def clean_land_data(params):
+#    loge('==============================================================================================')
+    dd = {}
+
+    for property_name, property_class in Land.properties().items():
+        if params.has_key(property_name):
+            dd[property_name] = params[property_name]
+
     data = {}
     if params.has_key('name'): data['name'] = params['name']
     if params.has_key('location'):

@@ -328,6 +328,40 @@ class TestLandPutHandler(BaseTestHandler):
         self.assertEqual(land.area, 100.50)
         self.assertEqual(land.price, 10000000.50)
 
+    def test_put_land__empty_optional_fields(self):
+        land = Land(
+            name = 'Wonderland',
+            location = '18.769937,99.003156',
+            features = 'NO VALIDATION YET',
+            area = 100.50,
+            price = 10000000.50,
+        )
+        land.put()
+
+        response = self.testapp.put('/api/lands/%s' % str(land.key()), {
+            'name': 'Neverland',
+            'location': '20.769937,100.003156',
+            'features': 'NO VALIDATION JUST YET',
+            'area': None,
+            'price': None,
+        })
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.content_type, 'application/json')
+
+        response_land = json.loads(response.normal_body)
+        self.assertEqual(response_land['name'], 'Neverland')
+        self.assertEqual(response_land['location'], '20.769937,100.003156')
+        self.assertEqual(response_land['features'], 'NO VALIDATION JUST YET')
+        self.assertEqual(response_land['area'], None)
+        self.assertEqual(response_land['price'], None)
+
+        land = Land.get(land.key())
+        self.assertEqual(land.name, 'Neverland')
+        self.assertEqual(land.location, '20.769937,100.003156')
+        self.assertEqual(land.features, 'NO VALIDATION JUST YET')
+        self.assertEqual(land.area, None)
+        self.assertEqual(land.price, None)
+
     def test_put_land__not_found(self):
         response = self.testapp.put('/api/lands/xxx', status=404)
         self.assertEqual(response.status_int, 404)
