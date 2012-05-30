@@ -9,6 +9,7 @@ from google.appengine.ext import db
 from webapp2_extras.appengine.users import login_required
 
 from .models import Land
+from .parsers import parse
 from .utils import to_dict
 
 
@@ -17,9 +18,6 @@ jinja_environment = jinja2.Environment(
     variable_start_string='{$',
     variable_end_string='$}',
 )
-
-
-
 
 
 class LandInstanceHandler(webapp2.RequestHandler):
@@ -32,35 +30,28 @@ class LandInstanceHandler(webapp2.RequestHandler):
             land = Land.get(key)
         except db.BadKeyError:
             self.error(404)
+            self.response.out.write(simplejson.dumps('Error 404 Not Found'))
         else:
             self.response.out.write(simplejson.dumps(to_dict(land)))
         self.response.headers['Content-Type'] = 'application/json'
 
+    @parse
     def put(self, key):
         try:
             land = Land.get(key)
         except db.BadKeyError:
             self.error(404)
+            self.response.headers['Content-Type'] = 'application/json'
+            self.response.out.write(simplejson.dumps('Error 404 Not Found'))
         else:
-            if self.request.headers['Content-Type'] == 'application/json':
-                body = simplejson.loads(self.request.body)
-                name = body['name']
-                location = body['location']
-                features = body['features']
-            else:
-                name = self.request.get('name')
-                location = self.request.get('location')
-                features = self.request.get('features')
-
-            user = users.get_current_user()
-
+            name = self.request.CONTENT.get('name')
+            location = self.request.CONTENT.get('location')
+            features = self.request.CONTENT.get('features')
             lat, lng = [l.strip() for l in location.split(',')]
 
             land.name = name
             land.location = db.GeoPt(lat, lng)
             land.features = features
-#            land.last_modified_by = user
-#            if not land.created_by: land.created_by = user
             land.put()
 
             self.response.headers['Content-Type'] = 'application/json'
@@ -71,26 +62,12 @@ class LandInstanceHandler(webapp2.RequestHandler):
             land = Land.get(key)
         except db.BadKeyError:
             self.error(404)
+            self.response.headers['Content-Type'] = 'application/json'
+            self.response.out.write(simplejson.dumps('Error 404 Not Found'))
         else:
             land.delete()
             self.response.set_status(204)
-        self.response.headers['Content-Type'] = 'application/json'
-
-
-#class ListOrCreateHandler(webapp2.RequestHandler):
-#
-#    def _parse(self):
-#        content_type = self.request.content_type
-#        if content_type == 'application/json':
-#            self.request.data = simplejson.loads(self.request.body)
-#
-#    @property
-#    def CONTENT(self):
-#        if not hasattr(self, '_content'):
-#            self._content = self._parse()
-#        return self._content
-
-
+            del self.response.headers['Content-Type']
 
 
 class LandListOrCreateHandler(webapp2.RequestHandler):
@@ -101,23 +78,14 @@ class LandListOrCreateHandler(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(simplejson.dumps(lands))
 
+    @parse
     def post(self):
-        if self.request.headers['Content-Type'] == 'application/json':
-            body = simplejson.loads(self.request.body)
-            name = body['name']
-            location = body['location']
-            features = body['features']
-        else:
-            name = self.request.get('name')
-            location = self.request.get('location')
-            features = self.request.get('features')
-
-        user = users.get_current_user()
-
-
+        name = self.request.CONTENT.get('name')
+        location = self.request.CONTENT.get('location')
+        features = self.request.CONTENT.get('features')
         lat, lng = [l.strip() for l in location.split(',')]
 
-        land = Land(name=name, location=location, features=features)
+        land = Land(name=name, location=db.GeoPt(lat, lng), features=features)
         land.put()
 
         self.response.set_status(201)
@@ -125,7 +93,7 @@ class LandListOrCreateHandler(webapp2.RequestHandler):
         self.response.out.write(simplejson.dumps(to_dict(land)))
 
 
-class MainHandler(webapp2.RequestHandler):
+class AppHandler(webapp2.RequestHandler):
 
     @login_required
     def get(self):
