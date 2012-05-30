@@ -20,6 +20,29 @@ jinja_environment = jinja2.Environment(
 )
 
 
+def clean_land_data(params):
+    data = {}
+    if params.has_key('name'): data['name'] = params['name']
+    if params.has_key('location'):
+        location = params['location']
+        lat, lng = [l.strip() for l in location.split(',')]
+        data['location'] = db.GeoPt(lat, lng)
+    if params.has_key('features'): data['features'] = params['features']
+    if params.has_key('area'):
+        try:
+            area = float(params['area'])
+        except (TypeError, ValueError):
+            area = None
+        data['area'] = area
+    if params.has_key('price'):
+        try:
+            price = float(params['price'])
+        except (TypeError, ValueError):
+            price = None
+        data['price'] = price
+    return data
+
+
 class LandInstanceHandler(webapp2.RequestHandler):
 
 #    def __init__(self, resource):
@@ -45,21 +68,9 @@ class LandInstanceHandler(webapp2.RequestHandler):
             self.response.headers['Content-Type'] = 'application/json'
             self.response.out.write(json.dumps('Error 404 Not Found'))
         else:
-            name = self.request.CONTENT.get('name')
-            location = self.request.CONTENT.get('location')
-            features = self.request.CONTENT.get('features')
-            area = self.request.CONTENT.get('area')
-            price = self.request.CONTENT.get('price')
-
-            lat, lng = [l.strip() for l in location.split(',')]
-            if area: area = float(area)
-            if price: price = float(price)
-
-            land.name = name
-            land.location = db.GeoPt(lat, lng)
-            land.features = features
-            if area: land.area = area
-            land.price = price
+            data = clean_land_data(self.request.CONTENT)
+            for k, v in data.items():
+                setattr(land, k, v)
             land.put()
 
             self.response.headers['Content-Type'] = 'application/json'
@@ -88,23 +99,8 @@ class LandListOrCreateHandler(webapp2.RequestHandler):
 
     @parse
     def post(self):
-        name = self.request.CONTENT.get('name')
-        location = self.request.CONTENT.get('location')
-        features = self.request.CONTENT.get('features')
-        area = self.request.CONTENT.get('area')
-        price = self.request.CONTENT.get('price')
-
-        lat, lng = [l.strip() for l in location.split(',')]
-        if area: area = float(area)
-        if price: price = float(price)
-
-        land = Land(
-            name = name,
-            location = db.GeoPt(lat, lng),
-            features = features,
-            area = area,
-            price = price,
-        )
+        data = clean_land_data(self.request.CONTENT)
+        land = Land(**data)
         land.put()
 
         self.response.set_status(201)
