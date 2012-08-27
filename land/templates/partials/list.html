@@ -1,8 +1,14 @@
+<div class="subnav">
+    <ul class="nav nav-pills">
+        <li><a href="/add">Add</a></li>
+        <li><a href="/add">Delete</a></li>
+    </ul>
+</div>
 <table class="table table-striped">
     <tbody>
         <tr ng-repeat="land in lands">
             <!--<td><input type="checkbox" ng-click="deleteLand(land)"/></td>-->
-            <td ><a href="#/edit/{{ land.key }}"><strong>{{ land.name }}</strong><br/>{{ land.location }}</a></td>
+            <td ><a href="/edit/{{ land.key }}"><strong>{{ land.name }}</strong><br/>{{ land.location }}</a></td>
             <!--<td><button class="icon-circle-arrow-down"></button></td>-->
         </tr>
     </tbody>

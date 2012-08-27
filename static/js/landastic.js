@@ -1,5 +1,6 @@
 angular.module('Landastic', ['ngResource']).
-    config(['$routeProvider', function($routeProvider) {
+    config(['$locationProvider', '$routeProvider', function($locationProvider, $routeProvider) {
+        $locationProvider.html5Mode(true);
         $routeProvider.
             when('/', {template: '/templates/partials/list.html', controller: LandListCtrl}).
             when('/add', {template: '/templates/partials/edit.html', controller: LandAddCtrl}).

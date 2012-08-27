@@ -18,6 +18,12 @@
             </div>
         </div>
         <div class="control-group">
+            <label class="control-label" for="land_description">Description</label>
+            <div class="controls">
+                <textarea id="land_description" ng-model="land.description" rows="5"/>
+            </div>
+        </div>
+        <div class="control-group">
             <label class="control-label" for="land_area">Area</label>
             <div class="controls">
                 <input type="text" id="land_area" ng-model="land.area"/>
@@ -31,6 +37,27 @@
         </div>
 
         <!--<textarea class="input-xlarge" rows="8" ng-model="land.features"/>-->
+    </fieldset>
+    <fieldset>
+        <legend>Prices</legend>
+        <div class="control-group">
+            <label class="control-label" for="land_ask_price">Ask price</label>
+            <div class="controls">
+                <input type="text" id="land_ask_price" ng-model="land.price"/>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="land_bid_price">Bid price</label>
+            <div class="controls">
+                <input type="text" id="land_bid_price" ng-model="land.price"/>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="land_market_price">Market price</label>
+            <div class="controls">
+                <input type="text" id="land_market_price" ng-model="land.price"/>
+            </div>
+        </div>
     </fieldset>
 
     <!--<p>Created: {{ land.created | date }}</p>-->
