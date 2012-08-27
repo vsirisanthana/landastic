@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os
 import json
@@ -8,7 +9,7 @@ from google.appengine.api import users
 from google.appengine.ext import db
 from webapp2_extras.appengine.users import login_required
 
-from .models import Land
+from .models import Land, Price
 from .parsers import parse
 from .utils import to_dict
 
@@ -43,6 +44,7 @@ def clean_land_data(params):
 
     data = {}
     if params.has_key('name'): data['name'] = params['name']
+    if params.has_key('description'): data['description'] = params['description']
     if params.has_key('location'):
         location = params['location']
         lat, lng = [l.strip() for l in location.split(',')]
@@ -62,6 +64,14 @@ def clean_land_data(params):
         data['price'] = price
     return data
 
+def clean_price_data(params):
+    data = {
+        'type': params['type'],
+        'value': params['value'],
+        'date': datetime.datetime.strptime(params['date'], '%Y-%m-%d %H:%M:%S')
+    }
+    return data
+
 
 class LandInstanceHandler(webapp2.RequestHandler):
 
@@ -75,7 +85,29 @@ class LandInstanceHandler(webapp2.RequestHandler):
             self.error(404)
             self.response.out.write(json.dumps('Error 404 Not Found'))
         else:
-            self.response.out.write(json.dumps(to_dict(land)))
+            ask_prices = Price.all().ancestor(land).filter('type =', 'ask').order('-date')
+            bid_prices = Price.all().ancestor(land).filter('type =', 'bid').order('-date')
+            market_prices = Price.all().ancestor(land).filter('type =', 'market').order('-date')
+
+            land.ask_price = ask_prices.get()
+            land.bid_price = bid_prices.get()
+            land.market_price = market_prices.get()
+
+#            print land.ask_price
+
+
+#            land.latest_ask_price = ask_prices[0] if ask_prices else None
+#            land.latest_bid_price = bid_prices[0] if bid_prices else None
+#            land.latest_market_price = market_prices[0] if market_prices else None
+
+            land_dict = to_dict(land)
+            land_dict.update({
+                'latest_ask_price': ask_prices.get(),
+                'latest_bid_price': bid_prices.get(),
+                'latest_market_price': market_prices.get(),
+            })
+
+            self.response.out.write(json.dumps(land_dict))
         self.response.headers['Content-Type'] = 'application/json'
 
     @parse
@@ -126,6 +158,38 @@ class LandListOrCreateHandler(webapp2.RequestHandler):
         self.response.set_status(201)
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json.dumps(to_dict(land)))
+
+
+class LandPriceListOrCreateHandler(webapp2.RequestHandler):
+
+    def get(self, key):
+        try:
+            land = Land.get(key)
+        except db.BadKeyError:
+            self.error(404)
+            self.response.out.write(json.dumps('Error 404 Not Found'))
+        else:
+            prices = Price.all().ancestor(land).order('-date')
+            prices = [to_dict(price) for price in prices]
+            self.response.out.write(json.dumps(prices))
+        self.response.headers['Content-Type'] = 'application/json'
+
+    @parse
+    def post(self, key):
+        try:
+            land = Land.get(key)
+        except db.BadKeyError:
+            self.error(404)
+            self.response.out.write(json.dumps('Error 404 Not Found'))
+        else:
+            data = clean_price_data(self.request.CONTENT)
+            price = Price(parent=land, **data)
+            price.put()
+
+            self.response.set_status(201)
+            self.response.headers['Content-Type'] = 'application/json'
+            self.response.out.write(json.dumps(to_dict(price)))
+
 
 from webob.multidict import MultiDict
 

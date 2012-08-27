@@ -10,8 +10,14 @@ class BaseModel(db.Model):
 
 class Land(BaseModel):
     name = db.StringProperty()
+    description = db.TextProperty()
     location = db.GeoPtProperty()
     features = db.TextProperty()
     area = db.FloatProperty()
     price = db.FloatProperty()
 
+
+class Price(BaseModel):
+    type = db.StringProperty(required=True)
+    value = db.FloatProperty(required=True)
+    date = db.DateTimeProperty(required=True)
